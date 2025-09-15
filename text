@@ -1,0 +1,37 @@
+tourforge-ai/
+├── index.html
+├── style.css
+├── script.js
+├── service-worker.js
+├── manifest.json
+├── icons/
+│   ├── icon-192.png
+│   └── icon-512.png
+├── assets/
+│   ├── sounds/
+│   │   ├── instruction-1.mp3
+│   │   ├── instruction-2.mp3
+│   │   ├── capture-sound.mp3
+│   │   ├── success-sound.mp3
+│   │   └── error-sound.mp3
+│   └── images/
+│       ├── arrow.png
+│       ├── target.png
+│       ├── logo.png
+│       └── loading.gif
+├── platforms/
+│   ├── cian-export.js
+│   ├── avito-export.js
+│   ├── domclick-export.js
+│   └── yandex-export.js
+├── tours/
+│   ├── tour-20240916-123456/
+│   │   ├── images/
+│   │   ├── plan.json
+│   │   ├── tour-data.json
+│   │   └── export/
+│   └── tour-20240917-789012/
+├── models/
+│   ├── object-detection/
+│   └── room-classification/
+└── temp/
