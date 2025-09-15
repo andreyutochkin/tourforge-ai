@@ -162,3 +162,62 @@ class AIProcessor {
         return roomTypes[Math.floor(Math.random() * roomTypes.length)];
     }
 }
+class UniversalExporter {
+    constructor() {
+        this.formats = {
+            zip: this.createZipArchive.bind(this),
+            json: this.createJsonExport.bind(this),
+            html: this.createHtmlTour.bind(this)
+        };
+    }
+
+    async exportTour(tourData, format = 'zip') {
+        const exporter = this.formats[format];
+        if (!exporter) {
+            throw new Error(`Unsupported format: ${format}`);
+        }
+
+        return await exporter(tourData);
+    }
+
+    async createZipArchive(tourData) {
+        const zip = new JSZip();
+        
+        // Добавляем все изображения
+        tourData.images.forEach((image, index) => {
+            const imgData = image.data.split(',')[1];
+            zip.file(`images/${image.roomType}-${index}.jpg`, imgData, { base64: true });
+        });
+        
+        // Добавляем структуру тура
+        zip.file('tour-structure.json', JSON.stringify({
+            rooms: tourData.rooms,
+            created: new Date().toISOString(),
+            version: '1.0'
+        }, null, 2));
+        
+        // Добавляем инструкции для ручной загрузки
+        zip.file('README.txt', this.createReadmeFile());
+        
+        return await zip.generateAsync({ 
+            type: 'blob',
+            compression: 'DEFLATE',
+            compressionOptions: { level: 6 }
+        });
+    }
+
+    async saveToDevice(blob, filename) {
+        return new Promise((resolve) => {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            
+            setTimeout(() => {
+                URL.revokeObjectURL(url);
+                resolve(url);
+            }, 100);
+        });
+    }
+}
