@@ -36,7 +36,7 @@ body {
     transition: transform 0.3s ease;
 }
 
-/* Экран приветствия */
+/* Главный экран */
 .header {
     text-align: center;
     margin-bottom: 2rem;
@@ -55,45 +55,15 @@ body {
     font-size: 1.1rem;
 }
 
-.features {
+.main-actions {
     flex: 1;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    gap: 1.5rem;
+    gap: 1rem;
     margin: 2rem 0;
 }
 
-.feature-item {
-    display: flex;
-    align-items: center;
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    padding: 1rem;
-    border-radius: 15px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.feature-item .icon {
-    font-size: 2rem;
-    margin-right: 1rem;
-    background: rgba(255, 255, 255, 0.2);
-    padding: 0.5rem;
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.feature-item p {
-    color: white;
-    font-size: 0.95rem;
-    flex: 1;
-}
-
-/* Кнопки */
 .btn-primary {
     background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
     color: white;
@@ -103,9 +73,12 @@ body {
     font-size: 1.1rem;
     font-weight: 600;
     cursor: pointer;
-    margin: 1rem 0;
     box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
     transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
 }
 
 .btn-primary:active {
@@ -123,10 +96,41 @@ body {
     cursor: pointer;
     backdrop-filter: blur(10px);
     transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
 }
 
 .btn-secondary:active {
     background: rgba(255, 255, 255, 0.3);
+}
+
+.platform-integration {
+    text-align: center;
+    margin-top: 2rem;
+}
+
+.platform-integration h3 {
+    color: white;
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+}
+
+.platform-icons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.platform-icon {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 15px;
+    font-size: 0.9rem;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 /* Экран камеры */
@@ -137,6 +141,12 @@ body {
     margin-bottom: 1rem;
 }
 
+.screen-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
 .btn-back {
     background: none;
     border: none;
@@ -144,6 +154,7 @@ body {
     font-size: 1.5rem;
     cursor: pointer;
     padding: 0.5rem;
+    margin-right: 1rem;
 }
 
 .progress-indicator {
@@ -235,11 +246,22 @@ body {
     margin: 0 auto;
 }
 
+.capture-hint {
+    background: rgba(52, 152, 219, 0.8);
+    color: white;
+    padding: 0.8rem;
+    border-radius: 10px;
+    text-align: center;
+    margin-top: 1rem;
+    font-size: 0.9rem;
+}
+
 .camera-controls {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 1rem;
+    margin: 1rem 0;
 }
 
 .btn-capture {
@@ -253,6 +275,8 @@ body {
     justify-content: center;
     cursor: pointer;
     box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+    position: relative;
+    z-index: 100;
 }
 
 .capture-icon {
@@ -282,27 +306,28 @@ body {
     border-radius: 4px;
 }
 
-.hint-container {
+.room-navigation {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
     margin-top: 1rem;
 }
 
-.hint-card {
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    padding: 1rem;
-    border-radius: 15px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.hint-card h3 {
+.btn-nav {
+    background: rgba(255, 255, 255, 0.2);
     color: white;
-    margin-bottom: 0.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 0.8rem 1rem;
+    border-radius: 20px;
     font-size: 0.9rem;
+    cursor: pointer;
+    backdrop-filter: blur(10px);
+    flex: 1;
 }
 
-.hint-card p {
-    color: rgba(255, 255, 255, 0.9);
-    font-size: 0.9rem;
+.btn-nav:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 /* Экран обработки */
@@ -324,6 +349,7 @@ body {
 
 .processing-animation {
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     height: 200px;
@@ -339,13 +365,16 @@ body {
 .ai-brain {
     width: 60px;
     height: 60px;
-    background: linear-gradient(135deg, #00ff88 0%, #00cc6a 100%);
+    font-size: 3rem;
     border-radius: 50%;
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     animation: pulse 2s ease-in-out infinite;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .pulse-ring {
@@ -383,6 +412,13 @@ body {
         opacity: 0;
         transform: translate(-50%, -50%) scale(2);
     }
+}
+
+.ai-status {
+    color: white;
+    text-align: center;
+    margin-top: 1rem;
+    font-size: 1rem;
 }
 
 .processing-steps {
@@ -538,6 +574,11 @@ body {
     font-weight: 600;
 }
 
+.room-item .room-area {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.7rem;
+}
+
 .action-buttons {
     display: grid;
     grid-template-columns: 1fr;
@@ -561,6 +602,123 @@ body {
 
 .btn-icon {
     font-size: 1.2rem;
+}
+
+.platform-export {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    padding: 1rem;
+    border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    margin-top: 1rem;
+}
+
+.platform-export h3 {
+    color: white;
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+    text-align: center;
+}
+
+.platform-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.btn-platform {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    backdrop-filter: blur(10px);
+}
+
+.btn-platform:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Экран просмотра тура */
+.tour-container {
+    flex: 1;
+    background: #000;
+    border-radius: 15px;
+    margin: 1rem 0;
+    overflow: hidden;
+    position: relative;
+}
+
+.tour-loading {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+}
+
+.loader {
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    border-top: 4px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-top: 1rem;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.tour-controls {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin: 1rem 0;
+}
+
+.btn-tour-control {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    cursor: pointer;
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tour-hotspots {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+}
+
+.hotspot-item {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 /* Модальное окно */
@@ -599,6 +757,7 @@ body {
     gap: 0.5rem;
     margin-bottom: 1rem;
     flex-wrap: wrap;
+    justify-content: center;
 }
 
 .edit-tool {
@@ -630,26 +789,110 @@ body {
     height: 100%;
 }
 
+.edit-options {
+    margin-bottom: 1rem;
+}
+
+.option-group {
+    margin-bottom: 0.5rem;
+}
+
+.option-group label {
+    display: block;
+    margin-bottom: 0.3rem;
+    font-size: 0.9rem;
+}
+
+.option-group input,
+.option-group select {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
 .modal-actions {
     display: flex;
     gap: 1rem;
     justify-content: center;
 }
 
+/* Элементы управления камерой */
+.camera-settings {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    z-index: 100;
+}
+
+.camera-settings button {
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-size: 1.2rem;
+    cursor: pointer;
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Уведомления */
+.toast-container {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1001;
+    width: 90%;
+    max-width: 400px;
+}
+
+.toast {
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 1rem;
+    border-radius: 10px;
+    margin-bottom: 0.5rem;
+    animation: toastIn 0.3s ease-out;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    text-align: center;
+}
+
+@keyframes toastIn {
+    from {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.toast.success {
+    border-left: 4px solid #00ff88;
+}
+
+.toast.error {
+    border-left: 4px solid #ff6b6b;
+}
+
+.toast.info {
+    border-left: 4px solid #3498db;
+}
+
 /* Адаптивность */
 @media (max-width: 480px) {
     .header h1 {
         font-size: 2rem;
-    }
-    
-    .feature-item {
-        padding: 0.8rem;
-    }
-    
-    .feature-item .icon {
-        width: 40px;
-        height: 40px;
-        font-size: 1.5rem;
     }
     
     .btn-primary {
@@ -665,74 +908,82 @@ body {
         width: 60px;
         height: 60px;
     }
+    
+    .room-navigation {
+        flex-direction: column;
+    }
+    
+    .platform-buttons {
+        flex-direction: column;
+    }
+    
+    .btn-platform {
+        width: 100%;
+    }
 }
 
-/* Анимации */
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+/* Списки туров */
+.tours-list {
+    flex: 1;
+    overflow-y: auto;
 }
 
-@keyframes slideIn {
-    from { transform: translateX(-100%); }
-    to { transform: translateX(0); }
-}
-
-.fade-in {
-    animation: fadeIn 0.5s ease-out;
-}
-
-.slide-in {
-    animation: slideIn 0.3s ease-out;
-}
-
-/* Утилиты */
-.hidden {
-    display: none !important;
-}
-
-.visible {
-    display: flex !important;
-}
-
-/* Toast уведомления */
-.toast-container {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 1001;
-}
-
-.toast {
-    background: rgba(0, 0, 0, 0.8);
-    color: white;
-    padding: 1rem;
-    border-radius: 10px;
-    margin-bottom: 0.5rem;
-    animation: toastIn 0.3s ease-out;
+.tour-item {
+    background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(10px);
+    border-radius: 15px;
+    padding: 1rem;
+    margin-bottom: 1rem;
     border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-@keyframes toastIn {
-    from {
-        transform: translateX(100%);
-        opacity: 0;
-    }
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
+.tour-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
 }
 
-.toast.success {
-    border-left: 4px solid #00ff88;
+.tour-item-title {
+    color: white;
+    font-weight: 600;
 }
 
-.toast.error {
-    border-left: 4px solid #ff6b6b;
+.tour-item-date {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.8rem;
 }
 
-.toast.info {
-    border-left: 4px solid #3498db;
+.tour-item-preview {
+    height: 120px;
+    background: #000;
+    border-radius: 10px;
+    margin-bottom: 0.5rem;
+    overflow: hidden;
+}
+
+.tour-item-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.tour-item-action {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: none;
+    padding: 0.5rem;
+    border-radius: 10px;
+    font-size: 0.8rem;
+    cursor: pointer;
+}
+
+.empty-state {
+    text-align: center;
+    color: white;
+    margin-top: 2rem;
+}
+
+.empty-state p {
+    margin-bottom: 1rem;
 }
