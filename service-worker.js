@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tourforge-ai-v1';
+const CACHE_NAME = 'tourforge-ai-v2';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -9,7 +9,10 @@ const urlsToCache = [
   '/icons/icon-512.png',
   '/assets/sounds/instruction-1.mp3',
   '/assets/sounds/capture.mp3',
-  '/assets/sounds/success.mp3'
+  '/assets/sounds/success.mp3',
+  '/platforms/cian-export.js',
+  '/platforms/avito-export.js',
+  '/platforms/domclick-export.js'
 ];
 
 self.addEventListener('install', event => {
@@ -23,5 +26,19 @@ self.addEventListener('fetch', event => {
   event.respondWith(
     caches.match(event.request)
       .then(response => response || fetch(event.request))
+  );
+});
+
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.map(cacheName => {
+          if (cacheName !== CACHE_NAME) {
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
   );
 });
