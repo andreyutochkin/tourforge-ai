@@ -12,7 +12,8 @@ const urlsToCache = [
   '/assets/sounds/success.mp3',
   '/platforms/cian-export.js',
   '/platforms/avito-export.js',
-  '/platforms/domclick-export.js'
+  '/platforms/domclick-export.js',
+  '/platforms/yandex-export.js'
 ];
 
 self.addEventListener('install', event => {
