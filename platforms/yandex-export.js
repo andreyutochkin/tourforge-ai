@@ -1,85 +1,70 @@
-class YandexRealtyExporter {
-    constructor() {
-        this.requirements = {
-            maxImageSize: 2048,
-            formats: ['jpg', 'png'],
-            maxFileSize: 10 * 1024 * 1024, // 10MB
-            supportedTypes: ['virtual_tour', 'panorama', '3d_model']
-        };
+class YandexExporter extends PlatformExporter {
+    async exportTour(tourData) {
+        try {
+            // Логика подготовки тура для Яндекс.Недвижимость
+            const preparedTour = await this.prepareForYandex(tourData);
+            
+            return {
+                success: true,
+                message: 'Тур подготовлен для Яндекс.Недвижимость',
+                downloadLink: this.createDownloadLink(preparedTour)
+            };
+        } catch (error) {
+            console.error('Yandex export error:', error);
+            return {
+                success: false,
+                message: 'Ошибка подготовки для Яндекс.Недвижимость'
+            };
+        }
     }
-
+    
     async prepareForYandex(tourData) {
-        // Оптимизация изображений под требования Яндекс.Недвижимость
+        // Приведение изображений к требованиям Яндекс.Недвижимость
         const optimizedImages = await this.optimizeImages(tourData.images, {
             maxWidth: 2048,
             maxHeight: 2048,
             quality: 0.9,
             format: 'jpg'
         });
-
-        // Создание метаданных специфичных для Яндекс
-        const metadata = {
+        
+        // Создание описания тура
+        const description = this.generateDescription(tourData.rooms);
+        
+        // Добавление специфичных метаданных для Яндекс
+        const yandexMetadata = {
+            ...tourData.rooms,
             platform: 'yandex_realty',
             version: '1.0',
-            created: new Date().toISOString(),
-            tour_id: this.generateTourId(),
             requirements: {
                 image_format: 'jpg',
                 max_size: '2048x2048',
                 compression: 'high'
             }
         };
-
+        
         return {
             images: optimizedImages,
-            metadata: metadata,
-            room_data: tourData.rooms,
-            tour_info: this.generateTourInfo(tourData)
+            description: description,
+            roomData: yandexMetadata,
+            type: 'virtual_tour'
         };
     }
-
-    async exportToYandex(tourData) {
-        try {
-            const preparedData = await this.prepareForYandex(tourData);
-            
-            // Создание ZIP архива для Яндекс
-            const zipBlob = await this.createYandexZipArchive(preparedData);
-            
-            // Сохранение на устройство
-            const downloadUrl = await this.saveToDevice(zipBlob, 'yandex-export.zip');
-            
-            return {
-                success: true,
-                downloadUrl: downloadUrl,
-                message: 'Тур подготовлен для Яндекс.Недвижимость'
-            };
-        } catch (error) {
-            console.error('Yandex export error:', error);
-            return {
-                success: false,
-                message: 'Ошибка при подготовке для Яндекс: ' + error.message
-            };
-        }
+    
+    createDownloadLink(tourData) {
+        // Создание ссылки для скачивания подготовленных файлов
+        const dataStr = JSON.stringify(tourData);
+        const dataBlob = new Blob([dataStr], {type: 'application/json'});
+        
+        return URL.createObjectURL(dataBlob);
     }
-
-    async createYandexZipArchive(tourData) {
-        const zip = new JSZip();
-        
-        // Добавляем оптимизированные изображения
-        tourData.images.forEach((image, index) => {
-            const imgData = image.data.split(',')[1];
-            zip.file(`images/room-${index}.jpg`, imgData, { base64: true });
-        });
-        
-        // Добавляем метаданные
-        zip.file('metadata.json', JSON.stringify(tourData.metadata, null, 2));
-        
-        // Добавляем информацию о туре
-        zip.file('tour-info.json', JSON.stringify(tourData.tour_info, null, 2));
-        
-        // Добавляем HTML просмотрщик
-        zip.file('viewer.html', this.generateViewerHtml(tourData));
-        
-        return await zip.generateAsync({ type: 'blob' });
+    
+    // Уникальный метод для Яндекс - создание архива с туром
+    async createTourArchive(tourData) {
+        // В реальном приложении здесь будет создание ZIP архива
+        // с использованием библиотеки JSZip
+        return new Blob([JSON.stringify(tourData)], { type: 'application/zip' });
     }
 }
+
+// Добавляем экспортер в глобальную область видимости
+window.yandexExporter = new YandexExporter();
