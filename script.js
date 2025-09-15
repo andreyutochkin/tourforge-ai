@@ -1,14 +1,19 @@
 // Основной класс приложения
 class TourForgeApp {
     constructor() {
-        this.currentScreen = 'welcome';
+        this.currentScreen = 'home';
         this.currentStep = 0;
-        this.totalSteps = 5;
+        this.totalSteps = 8;
         this.capturedImages = [];
         this.roomData = [];
         this.isProcessing = false;
         this.mediaStream = null;
-        this.currentRoom = 'Гостиная';
+        this.currentRoomIndex = 0;
+        this.rooms = ['Гостиная', 'Кухня', 'Спальня', 'Ванная', 'Коридор', 'Балкон'];
+        this.capturesPerRoom = 0;
+        this.maxCapturesPerRoom = 8;
+        this.voiceGuide = new VoiceGuidance();
+        this.platformExporter = new PlatformExporter();
         
         this.initializeApp();
     }
@@ -19,23 +24,51 @@ class TourForgeApp {
         this.checkCameraAccess();
         this.loadSounds();
         this.setupServiceWorker();
+        this.loadTours();
     }
 
     // Привязка событий
     bindEvents() {
-        // Кнопки навигации
-        document.getElementById('startButton').addEventListener('click', () => this.showCameraScreen());
-        document.getElementById('backButton').addEventListener('click', () => this.goBack());
-        document.getElementById('captureButton').addEventListener('click', () => this.captureImage());
+        // Навигация
+        document.getElementById('startTour').addEventListener('click', () => this.showCameraScreen());
+        document.getElementById('myTours').addEventListener('click', () => this.showToursScreen());
+        document.getElementById('backFromTours').addEventListener('click', () => this.showHomeScreen());
+        document.getElementById('backFromCamera').addEventListener('click', () => this.showHomeScreen());
+        document.getElementById('backFromViewer').addEventListener('click', () => this.showResultScreen());
+        document.getElementById('createFirstTour').addEventListener('click', () => this.showCameraScreen());
         
-        // Кнопки результатов
+        // Управление камерой
+        document.getElementById('captureButton').addEventListener('click', () => this.captureImage());
+        document.getElementById('switchCamera').addEventListener('click', () => this.switchCamera());
+        document.getElementById('toggleFlash').addEventListener('click', () => this.toggleFlash());
+        
+        // Навигация по комнатам
+        document.getElementById('prevRoom').addEventListener('click', () => this.previousRoom());
+        document.getElementById('nextRoom').addEventListener('click', () => this.nextRoom());
+        
+        // Результаты
         document.getElementById('viewTourButton').addEventListener('click', () => this.viewTour());
         document.getElementById('shareButton').addEventListener('click', () => this.shareTour());
         document.getElementById('editPlanButton').addEventListener('click', () => this.editPlan());
         
-        // Кнопки модального окна
+        // Платформы
+        document.querySelectorAll('.btn-platform').forEach(btn => {
+            btn.addEventListener('click', (e) => this.exportToPlatform(e.target.dataset.platform));
+        });
+        
+        // Модальное окно
         document.getElementById('cancelEdit').addEventListener('click', () => this.closeModal());
         document.getElementById('saveEdit').addEventListener('click', () => this.saveEdit());
+        
+        // Инструменты редактирования
+        document.querySelectorAll('.edit-tool').forEach(tool => {
+            tool.addEventListener('click', (e) => this.selectEditTool(e.target.dataset.tool));
+        });
+        
+        // Управление туром
+        document.getElementById('zoomIn').addEventListener('click', () => this.zoomIn());
+        document.getElementById('zoomOut').addEventListener('click', () => this.zoomOut());
+        document.getElementById('fullscreen').addEventListener('click', () => this.toggleFullscreen());
         
         // Обработка изменения ориентации
         window.addEventListener('orientationchange', () => this.handleOrientationChange());
@@ -80,6 +113,58 @@ class TourForgeApp {
         }
     }
 
+    // Загрузка списка туров
+    loadTours() {
+        const tours = JSON.parse(localStorage.getItem('tours') || '[]');
+        this.displayTours(tours);
+    }
+
+    // Отображение списка туров
+    displayTours(tours) {
+        const toursList = document.getElementById('toursList');
+        
+        if (tours.length === 0) {
+            toursList.innerHTML = `
+                <div class="empty-state">
+                    <p>У вас пока нет созданных туров</p>
+                    <button class="btn-primary" id="createFirstTour">Создать первый тур</button>
+                </div>
+            `;
+            document.getElementById('createFirstTour').addEventListener('click', () => this.showCameraScreen());
+            return;
+        }
+        
+        toursList.innerHTML = tours.map(tour => `
+            <div class="tour-item">
+                <div class="tour-item-header">
+                    <div class="tour-item-title">${tour.name}</div>
+                    <div class="tour-item-date">${new Date(tour.date).toLocaleDateString()}</div>
+                </div>
+                <div class="tour-item-preview" style="background: url('${tour.preview}') center/cover;"></div>
+                <div class="tour-item-actions">
+                    <button class="tour-item-action" onclick="app.viewSavedTour(${tour.id})">Просмотр</button>
+                    <button class="tour-item-action" onclick="app.shareTour(${tour.id})">Поделиться</button>
+                    <button class="tour-item-action" onclick="app.deleteTour(${tour.id})">Удалить</button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // Показать главный экран
+    showHomeScreen() {
+        this.hideAllScreens();
+        document.getElementById('homeScreen').style.display = 'flex';
+        this.currentScreen = 'home';
+    }
+
+    // Показать экран списка туров
+    showToursScreen() {
+        this.hideAllScreens();
+        document.getElementById('toursScreen').style.display = 'flex';
+        this.currentScreen = 'tours';
+        this.loadTours();
+    }
+
     // Показать экран камеры
     async showCameraScreen() {
         this.hideAllScreens();
@@ -118,29 +203,48 @@ class TourForgeApp {
         }
     }
 
+    // Переключение камеры
+    async switchCamera() {
+        this.stopCamera();
+        
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ 
+                video: { 
+                    facingMode: this.mediaStream ? 'user' : 'environment',
+                    width: { ideal: 1920 },
+                    height: { ideal: 1080 }
+                } 
+            });
+            this.mediaStream = stream;
+            
+            const video = document.getElementById('cameraView');
+            video.srcObject = stream;
+            await video.play();
+            
+            this.showToast('Камера переключена', 'success');
+        } catch (error) {
+            this.showToast('Ошибка переключения камеры', 'error');
+            console.error('Camera switch error:', error);
+        }
+    }
+
+    // Переключение вспышки
+    toggleFlash() {
+        // Реализация включения/выключения вспышки
+        this.showToast('Вспышка пока не поддерживается', 'info');
+    }
+
     // Запуск системы подсказок
     startGuidance() {
         this.currentStep = 1;
+        this.capturesPerRoom = 0;
+        this.currentRoomIndex = 0;
         this.updateProgress();
-        this.giveInstruction('Встаньте в центре комнаты и медленно поворачивайтесь на 360 градусов');
+        this.updateRoomNavigation();
         
-        // Симуляция обнаружения комнат (в реальном приложении будет компьютерное зрение)
-        setTimeout(() => {
-            this.detectRoom('Гостиная');
-        }, 2000);
-    }
-
-    // Дать инструкцию пользователю
-    giveInstruction(text) {
-        const instructionBox = document.getElementById('instructionBox');
-        instructionBox.querySelector('p').textContent = text;
+        this.voiceGuide.speak(`Начинаем съемку ${this.rooms[this.currentRoomIndex]}. Встаньте в центре комнаты и медленно поворачивайтесь на 360 градусов. Делайте снимки каждые 45 градусов.`);
         
-        // Проигрывание звуковой подсказки
-        this.playSound('instruction');
-        
-        // Показ анимации инструкции
-        instructionBox.classList.add('fade-in');
-        setTimeout(() => instructionBox.classList.remove('fade-in'), 3000);
+        this.showOverlayInstruction(`Снимаем ${this.rooms[this.currentRoomIndex]}. Делайте снимки каждые 45 градусов.`);
     }
 
     // Обновление прогресса
@@ -153,24 +257,19 @@ class TourForgeApp {
         document.getElementById('progressText').textContent = `${Math.round(progress)}%`;
     }
 
-    // Обнаружение комнаты
-    detectRoom(roomName) {
-        this.currentRoom = roomName;
-        document.getElementById('roomLabel').textContent = roomName;
-        
-        this.giveInstruction(`Обнаружена ${roomName}. Продолжайте медленно поворачиваться`);
-        
-        // Обновление подсказки
-        const hints = [
-            'Держите телефон на уровне груди',
-            'Двигайтесь медленно и плавно',
-            'Старайтесь захватить все углы комнаты',
-            'Избегайте резких движений',
-            'Следите за освещением - избегайте прямых солнечных лучей'
-        ];
-        
-        document.getElementById('currentHint').textContent = 
-            hints[Math.floor(Math.random() * hints.length)];
+    // Обновление навигации по комнатам
+    updateRoomNavigation() {
+        document.getElementById('prevRoom').disabled = this.currentRoomIndex === 0;
+        document.getElementById('nextRoom').disabled = this.currentRoomIndex === this.rooms.length - 1;
+        document.getElementById('roomLabel').textContent = this.rooms[this.currentRoomIndex];
+    }
+
+    // Показать оверлей с инструкцией
+    showOverlayInstruction(text) {
+        const instructionBox = document.getElementById('instructionBox');
+        instructionBox.querySelector('p').textContent = text;
+        instructionBox.classList.add('fade-in');
+        setTimeout(() => instructionBox.classList.remove('fade-in'), 5000);
     }
 
     // Захват изображения
@@ -193,8 +292,9 @@ class TourForgeApp {
         const imageData = canvas.toDataURL('image/jpeg', 0.8);
         this.capturedImages.push({
             data: imageData,
-            room: this.currentRoom,
-            timestamp: Date.now()
+            room: this.rooms[this.currentRoomIndex],
+            timestamp: Date.now(),
+            angle: this.capturesPerRoom * 45
         });
         
         // Проигрывание звука
@@ -203,26 +303,46 @@ class TourForgeApp {
         // Показ анимации захвата
         this.showCaptureAnimation();
         
-        // Переход к следующему шагу
-        setTimeout(() => {
-            this.currentStep++;
-            this.updateProgress();
-            
-            if (this.currentStep <= this.totalSteps) {
-                this.simulateRoomDetection();
-            } else {
-                this.processImages();
-            }
-            
-            this.isProcessing = false;
-        }, 1000);
+        // Обновление прогресса
+        this.capturesPerRoom++;
+        this.currentStep++;
+        this.updateProgress();
+        
+        // Голосовая подсказка
+        if (this.capturesPerRoom < this.maxCapturesPerRoom) {
+            const remaining = this.maxCapturesPerRoom - this.capturesPerRoom;
+            this.voiceGuide.speak(`Снимок принят. Осталось ${remaining} снимков в этой комнате.`);
+        } else {
+            this.voiceGuide.speak(`Комната ${this.rooms[this.currentRoomIndex]} завершена. Готовы перейти к следующей комнате?`);
+        }
+        
+        this.isProcessing = false;
     }
 
-    // Симуляция обнаружения комнат
-    simulateRoomDetection() {
-        const rooms = ['Кухня', 'Спальня', 'Ванная', 'Коридор', 'Балкон'];
-        if (this.currentStep <= rooms.length) {
-            this.detectRoom(rooms[this.currentStep - 1]);
+    // Переход к следующей комнате
+    nextRoom() {
+        if (this.currentRoomIndex < this.rooms.length - 1) {
+            this.currentRoomIndex++;
+            this.capturesPerRoom = 0;
+            this.updateRoomNavigation();
+            
+            this.voiceGuide.speak(`Начинаем съемку ${this.rooms[this.currentRoomIndex]}. Встаньте в центре комнаты и медленно поворачивайтесь.`);
+            this.showOverlayInstruction(`Снимаем ${this.rooms[this.currentRoomIndex]}. Делайте снимки каждые 45 градусов.`);
+        } else {
+            this.voiceGuide.speak("Все комнаты сфотографированы. Начинаем обработку.");
+            this.processImages();
+        }
+    }
+
+    // Переход к предыдущей комнате
+    previousRoom() {
+        if (this.currentRoomIndex > 0) {
+            this.currentRoomIndex--;
+            this.capturesPerRoom = 0;
+            this.updateRoomNavigation();
+            
+            this.voiceGuide.speak(`Возвращаемся к съемке ${this.rooms[this.currentRoomIndex]}.`);
+            this.showOverlayInstruction(`Снимаем ${this.rooms[this.currentRoomIndex]}. Делайте снимки каждые 45 градусов.`);
         }
     }
 
@@ -256,9 +376,10 @@ class TourForgeApp {
         
         // Симуляция обработки с прогрессом
         const steps = document.querySelectorAll('.processing-step');
+        const status = document.getElementById('aiStatus');
         
         for (let i = 0; i < steps.length; i++) {
-            await this.simulateProcessingStep(steps[i], i);
+            await this.simulateProcessingStep(steps[i], i, status);
         }
         
         // Генерация плана помещения
@@ -269,7 +390,7 @@ class TourForgeApp {
     }
 
     // Симуляция шага обработки
-    async simulateProcessingStep(step, index) {
+    async simulateProcessingStep(step, index, status) {
         return new Promise(resolve => {
             setTimeout(() => {
                 step.classList.add('active');
@@ -282,12 +403,23 @@ class TourForgeApp {
                     'Генерация виртуального тура...'
                 ];
                 
+                const statusTexts = [
+                    'ИИ анализирует геометрию помещения и определяет структуру стен',
+                    'Определяем размеры и площади каждой комнаты',
+                    'Создаем 3D модель на основе ваших снимков',
+                    'Генерируем интерактивный тур для просмотра'
+                ];
+                
                 if (stepTexts[index]) {
                     step.querySelector('.step-text').textContent = stepTexts[index];
                 }
                 
+                if (statusTexts[index]) {
+                    status.textContent = statusTexts[index];
+                }
+                
                 resolve();
-            }, 1500);
+            }, 2000);
         });
     }
 
@@ -297,15 +429,18 @@ class TourForgeApp {
         // Сейчас просто симулируем создание плана
         
         this.roomData = [
-            { name: 'Гостиная', area: 20, coordinates: { x: 50, y: 50 } },
-            { name: 'Кухня', area: 12, coordinates: { x: 150, y: 50 } },
-            { name: 'Спальня', area: 15, coordinates: { x: 50, y: 150 } },
-            { name: 'Ванная', area: 8, coordinates: { x: 150, y: 150 } },
-            { name: 'Коридор', area: 10, coordinates: { x: 100, y: 100 } }
+            { name: 'Гостиная', area: 20, coordinates: { x: 50, y: 50 }, color: 'rgba(255, 107, 107, 0.6)' },
+            { name: 'Кухня', area: 12, coordinates: { x: 150, y: 50 }, color: 'rgba(77, 171, 247, 0.6)' },
+            { name: 'Спальня', area: 15, coordinates: { x: 50, y: 150 }, color: 'rgba(130, 224, 170, 0.6)' },
+            { name: 'Ванная', area: 8, coordinates: { x: 150, y: 150 }, color: 'rgba(180, 142, 173, 0.6)' },
+            { name: 'Коридор', area: 10, coordinates: { x: 100, y: 100 }, color: 'rgba(245, 176, 65, 0.6)' }
         ];
         
         // Отрисовка плана
         this.drawFloorPlan();
+        
+        // Сохранение тура
+        this.saveTour();
     }
 
     // Отрисовка плана помещения
@@ -323,7 +458,7 @@ class TourForgeApp {
             // Простая отрисовка прямоугольных комнат
             const roomSize = Math.sqrt(room.area) * 10;
             
-            ctx.fillStyle = this.getRoomColor(room.name);
+            ctx.fillStyle = room.color;
             ctx.fillRect(room.coordinates.x, room.coordinates.y, roomSize, roomSize);
             
             ctx.strokeStyle = '#333';
@@ -341,20 +476,6 @@ class TourForgeApp {
         
         // Заполнение списка комнат
         this.populateRoomList();
-    }
-
-    // Получение цвета для комнаты
-    getRoomColor(roomName) {
-        const colors = {
-            'Гостиная': 'rgba(255, 107, 107, 0.6)',
-            'Кухня': 'rgba(77, 171, 247, 0.6)',
-            'Спальня': 'rgba(130, 224, 170, 0.6)',
-            'Ванная': 'rgba(180, 142, 173, 0.6)',
-            'Коридор': 'rgba(245, 176, 65, 0.6)',
-            'Балкон': 'rgba(169, 113, 243, 0.6)'
-        };
-        
-        return colors[roomName] || 'rgba(200, 200, 200, 0.6)';
     }
 
     // Заполнение списка комнат
@@ -390,6 +511,24 @@ class TourForgeApp {
         return icons[roomName] || '🏠';
     }
 
+    // Сохранение тура
+    saveTour() {
+        const tour = {
+            id: Date.now(),
+            name: `Тур от ${new Date().toLocaleDateString()}`,
+            date: new Date().toISOString(),
+            preview: this.capturedImages[0]?.data || '',
+            rooms: this.roomData,
+            images: this.capturedImages
+        };
+        
+        const tours = JSON.parse(localStorage.getItem('tours') || '[]');
+        tours.push(tour);
+        localStorage.setItem('tours', JSON.stringify(tours));
+        
+        this.currentTourId = tour.id;
+    }
+
     // Показать результаты
     showResults() {
         this.hideAllScreens();
@@ -398,12 +537,74 @@ class TourForgeApp {
         
         this.playSound('success');
         this.showToast('План помещения успешно создан!', 'success');
+        this.voiceGuide.speak('Ваш тур готов! Вы можете просмотреть его, отредактировать план или поделиться с другими.');
     }
 
     // Просмотр тура
     viewTour() {
-        this.showToast('3D тур будет открыт в новом окне', 'info');
-        // В реальном приложении здесь будет открытие 3D тура
+        this.hideAllScreens();
+        document.getElementById('tourViewerScreen').style.display = 'flex';
+        this.currentScreen = 'viewer';
+        
+        this.loadTourViewer();
+    }
+
+    // Загрузка просмотрщика тура
+    loadTourViewer() {
+        const tourContainer = document.getElementById('tourContainer');
+        const hotspotsContainer = document.getElementById('tourHotspots');
+        
+        // Симуляция загрузки
+        tourContainer.innerHTML = `
+            <div class="tour-loading">
+                <p>Загрузка 3D тура...</p>
+                <div class="loader"></div>
+            </div>
+        `;
+        
+        // Через 2 секунды "загружаем" тур
+        setTimeout(() => {
+            tourContainer.innerHTML = `
+                <div class="tour-content">
+                    <img src="${this.capturedImages[0]?.data}" alt="3D тур" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+            `;
+            
+            // Добавляем горячие точки
+            hotspotsContainer.innerHTML = `
+                <div class="hotspot-item" data-target="living-room">Гостиная</div>
+                <div class="hotspot-item" data-target="kitchen">Кухня</div>
+                <div class="hotspot-item" data-target="bedroom">Спальня</div>
+                <div class="hotspot-item" data-target="bathroom">Ванная</div>
+            `;
+            
+            // Добавляем обработчики для горячих точек
+            document.querySelectorAll('.hotspot-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    this.voiceGuide.speak(`Переходим к ${item.textContent}`);
+                    this.showToast(`Переход к ${item.textContent}`, 'info');
+                });
+            });
+        }, 2000);
+    }
+
+    // Увеличение
+    zoomIn() {
+        this.showToast('Увеличиваем', 'info');
+    }
+
+    // Уменьшение
+    zoomOut() {
+        this.showToast('Уменьшаем', 'info');
+    }
+
+    // Полноэкранный режим
+    toggleFullscreen() {
+        if (document.fullscreenElement) {
+            document.exitFullscreen();
+        } else {
+            document.documentElement.requestFullscreen();
+        }
     }
 
     // Поделиться туром
@@ -423,9 +624,123 @@ class TourForgeApp {
         }
     }
 
+    // Экспорт на платформу
+    async exportToPlatform(platform) {
+        try {
+            this.showToast(`Подготовка для ${platform}...`, 'info');
+            
+            // Используем соответствующий модуль экспорта
+            const exporter = window[`${platform}Exporter`];
+            if (exporter) {
+                const result = await exporter.exportTour(this.capturedImages, this.roomData);
+                this.showToast(`Тур подготовлен для ${platform}`, 'success');
+                
+                // Предложить скачать или скопировать ссылку
+                if (result.url) {
+                    window.open(result.url, '_blank');
+                }
+            } else {
+                this.showToast(`Экспорт на ${platform} пока не поддерживается`, 'error');
+            }
+        } catch (error) {
+            this.showToast(`Ошибка экспорта на ${platform}`, 'error');
+            console.error('Export error:', error);
+        }
+    }
+
     // Редактирование плана
     editPlan() {
         document.getElementById('editModal').style.display = 'flex';
+        this.initEditor();
+    }
+
+    // Инициализация редактора
+    initEditor() {
+        const canvas = document.getElementById('editCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Очистка canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Отрисовка плана для редактирования
+        this.roomData.forEach(room => {
+            const roomSize = Math.sqrt(room.area) * 10;
+            
+            ctx.fillStyle = room.color;
+            ctx.fillRect(room.coordinates.x, room.coordinates.y, roomSize, roomSize);
+            
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(room.coordinates.x, room.coordinates.y, roomSize, roomSize);
+            
+            // Добавление текста
+            ctx.fillStyle = '#000';
+            ctx.font = '12px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(room.name, room.coordinates.x + roomSize/2, room.coordinates.y + roomSize/2);
+        });
+    }
+
+    // Выбор инструмента редактирования
+    selectEditTool(tool) {
+        document.querySelectorAll('.edit-tool').forEach(t => t.classList.remove('active'));
+        document.querySelector(`[data-tool="${tool}"]`).classList.add('active');
+        
+        // Показать опции для выбранного инструмента
+        this.showEditOptions(tool);
+    }
+
+    // Показать опции редактирования
+    showEditOptions(tool) {
+        const optionsContainer = document.getElementById('editOptions');
+        
+        const options = {
+            'select': '<p>Выберите элемент для редактирования</p>',
+            'wall': `
+                <div class="option-group">
+                    <label>Толщина стены</label>
+                    <input type="range" min="1" max="10" value="2">
+                </div>
+                <div class="option-group">
+                    <label>Цвет стены</label>
+                    <input type="color" value="#cccccc">
+                </div>
+            `,
+            'door': `
+                <div class="option-group">
+                    <label>Тип двери</label>
+                    <select>
+                        <option>Обычная</option>
+                        <option>Двустворчатая</option>
+                        <option>Раздвижная</option>
+                    </select>
+                </div>
+            `,
+            'window': `
+                <div class="option-group">
+                    <label>Тип окна</label>
+                    <select>
+                        <option>Обычное</option>
+                        <option>Панорамное</option>
+                        <option>С текстурами</option>
+                    </select>
+                </div>
+            `,
+            'furniture': `
+                <div class="option-group">
+                    <label>Тип мебели</label>
+                    <select>
+                        <option>Диван</option>
+                        <option>Кровать</option>
+                        <option>Шкаф</option>
+                        <option>Стол</option>
+                        <option>Стул</option>
+                    </select>
+                </div>
+            `
+        };
+        
+        optionsContainer.innerHTML = options[tool] || '';
     }
 
     // Закрытие модального окна
@@ -435,8 +750,12 @@ class TourForgeApp {
 
     // Сохранение изменений
     saveEdit() {
-        this.closeModal();
+        // Здесь будет логика сохранения изменений
         this.showToast('Изменения сохранены', 'success');
+        this.closeModal();
+        
+        // Перерисовываем план с изменениями
+        this.drawFloorPlan();
     }
 
     // Назад
@@ -444,18 +763,20 @@ class TourForgeApp {
         switch (this.currentScreen) {
             case 'camera':
                 this.stopCamera();
-                this.hideAllScreens();
-                document.getElementById('welcomeScreen').style.display = 'flex';
-                this.currentScreen = 'welcome';
+                this.showHomeScreen();
                 break;
             case 'processing':
                 this.stopProcessing();
                 this.showCameraScreen();
                 break;
             case 'results':
-                this.hideAllScreens();
-                document.getElementById('welcomeScreen').style.display = 'flex';
-                this.currentScreen = 'welcome';
+                this.showHomeScreen();
+                break;
+            case 'viewer':
+                this.showResultScreen();
+                break;
+            case 'tours':
+                this.showHomeScreen();
                 break;
         }
     }
@@ -514,9 +835,56 @@ class TourForgeApp {
     }
 }
 
+// Класс голосовых подсказок
+class VoiceGuidance {
+    constructor() {
+        this.synth = window.speechSynthesis;
+        this.utterance = null;
+    }
+
+    speak(text) {
+        if (this.synth.speaking) {
+            this.synth.cancel();
+        }
+        
+        this.utterance = new SpeechSynthesisUtterance(text);
+        this.utterance.lang = 'ru-RU';
+        this.utterance.rate = 0.9;
+        
+        this.synth.speak(this.utterance);
+    }
+
+    stop() {
+        if (this.synth.speaking) {
+            this.synth.cancel();
+        }
+    }
+}
+
+// Базовый класс для экспорта на платформы
+class PlatformExporter {
+    constructor() {
+        this.platforms = {
+            'cian': { name: 'Циан', format: 'jpg', maxSize: 50 },
+            'avito': { name: 'Авито', format: 'jpg', maxSize: 30 },
+            'domclick': { name: 'ДомКлик', format: 'png', maxSize: 40 }
+        };
+    }
+
+    async exportTour(images, roomData) {
+        // Базовая реализация, должна быть переопределена в дочерних классах
+        return {
+            success: true,
+            message: 'Тур подготовлен для экспорта',
+            url: null
+        };
+    }
+}
+
 // Инициализация приложения после загрузки DOM
+let app;
 document.addEventListener('DOMContentLoaded', () => {
-    new TourForgeApp();
+    app = new TourForgeApp();
 });
 
 // Service Worker для оффлайн-работы
@@ -533,11 +901,4 @@ if ('serviceWorker' in navigator) {
 // Обработка ошибок
 window.addEventListener('error', e => {
     console.error('Application error:', e.error);
-    alert('Произошла ошибка в приложении. Пожалуйста, перезагрузите страницу.');
-});
-
-// Регистрация приложения как PWA
-window.addEventListener('beforeinstallprompt', e => {
-    e.preventDefault();
-    console.log('PWA install prompt available');
 });
