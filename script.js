@@ -1,10 +1,9 @@
-```javascript
 // TourForge AI - Основной файл приложения
 class TourForgeApp {
     constructor() {
         this.currentScreen = 'home';
         this.currentStep = 0;
-        this.totalSteps = 8;
+        this.totalSteps = 12; // Увеличили количество шагов для лучшего качества
         this.capturedImages = [];
         this.roomData = [];
         this.isProcessing = false;
@@ -12,7 +11,7 @@ class TourForgeApp {
         this.currentRoomIndex = 0;
         this.rooms = ['Гостиная', 'Кухня', 'Спальня', 'Ванная', 'Коридор', 'Балкон'];
         this.capturesPerRoom = 0;
-        this.maxCapturesPerRoom = 8;
+        this.maxCapturesPerRoom = 12; // Увеличили количество снимков для панорамы
         this.voiceGuide = new VoiceGuidance();
         this.platformExporter = new PlatformExporter();
         this.cameraManager = new CameraManager();
@@ -20,6 +19,7 @@ class TourForgeApp {
         this.roomManager = new RoomManager();
         this.universalExporter = new UniversalExporter();
         this.sensorManager = new PhoneSensorManager();
+        this.panoramaViewer = new PanoramaViewer();
         
         this.initializeApp();
     }
@@ -82,9 +82,20 @@ class TourForgeApp {
         });
         
         // Управление туром
-        document.getElementById('zoomIn').addEventListener('click', () => this.zoomIn());
-        document.getElementById('zoomOut').addEventListener('click', () => this.zoomOut());
+        document.getElementById('panoramaLeft').addEventListener('click', () => this.rotatePanorama(-30));
+        document.getElementById('panoramaRight').addEventListener('click', () => this.rotatePanorama(30));
+        document.getElementById('panoramaZoomIn').addEventListener('click', () => this.zoomPanorama(0.1));
+        document.getElementById('panoramaZoomOut').addEventListener('click', () => this.zoomPanorama(-0.1));
         document.getElementById('fullscreenButton').addEventListener('click', () => this.toggleFullscreen());
+        
+        // Навигация по точкам
+        document.getElementById('prevPoint').addEventListener('click', () => this.previousPoint());
+        document.getElementById('nextPoint').addEventListener('click', () => this.nextPoint());
+        
+        // Горячие точки
+        document.querySelectorAll('.hotspot').forEach(hotspot => {
+            hotspot.addEventListener('click', (e) => this.navigateToPoint(e.target.dataset.target));
+        });
     }
 
     // Показать экран
@@ -103,6 +114,8 @@ class TourForgeApp {
             this.initializeCamera();
         } else if (screenId === 'tours') {
             this.loadTours();
+        } else if (screenId === 'tourViewer') {
+            this.loadTourViewer();
         }
     }
 
@@ -138,7 +151,6 @@ class TourForgeApp {
     // Показать экран просмотра тура
     showTourViewerScreen() {
         this.showScreen('tourViewer');
-        this.loadTourViewer();
     }
 
     // Инициализация камеры
@@ -169,9 +181,49 @@ class TourForgeApp {
         this.updateProgress();
         this.updateRoomNavigation();
         
-        this.voiceGuide.speak(`Начинаем съемку ${this.rooms[this.currentRoomIndex]}. Встаньте в центре комнаты и медленно поворачивайтесь на 360 градусов. Делайте снимки каждые 45 градусов.`);
+        this.voiceGuide.speak(`Начинаем съемку ${this.rooms[this.currentRoomIndex]}. Встаньте в центре комнаты и медленно поворачивайтесь на 360 градусов. Делайте снимки каждые 30 градусов.`);
         
-        this.showOverlayInstruction(`Снимаем ${this.rooms[this.currentRoomIndex]}. Делайте снимки каждые 45 градусов.`);
+        this.showOverlayInstruction(`Снимаем ${this.rooms[this.currentRoomIndex]}. Делайте снимки каждые 30 градусов.`);
+        
+        // Запуск отслеживания угла поворота
+        this.startAngleTracking();
+    }
+
+    // Запуск отслеживания угла поворота
+    startAngleTracking() {
+        let lastAngle = 0;
+        
+        const updateAngle = () => {
+            if (this.currentScreen !== 'camera') return;
+            
+            const currentAngle = this.sensorManager.getCurrentAngle();
+            const angleDiff = Math.abs(currentAngle - lastAngle);
+            
+            if (angleDiff > 5) {
+                lastAngle = currentAngle;
+                this.updateAngleIndicator(currentAngle);
+                
+                // Автоматический захват при повороте на 30 градусов
+                if (this.capturesPerRoom > 0 && angleDiff >= 30) {
+                    this.captureImage();
+                }
+            }
+            
+            requestAnimationFrame(updateAngle);
+        };
+        
+        requestAnimationFrame(updateAngle);
+    }
+
+    // Обновление индикатора угла
+    updateAngleIndicator(angle) {
+        const angleText = document.querySelector('.angle-text');
+        const angleHand = document.querySelector('.angle-hand');
+        
+        if (angleText && angleHand) {
+            angleText.textContent = `${Math.round(angle)}°`;
+            angleHand.style.transform = `translate(-50%, -100%) rotate(${angle}deg)`;
+        }
     }
 
     // Обновление прогресса
@@ -182,6 +234,7 @@ class TourForgeApp {
         const progress = (this.currentStep / this.totalSteps) * 100;
         document.getElementById('progressFill').style.width = `${progress}%`;
         document.getElementById('progressText').textContent = `${Math.round(progress)}% завершено`;
+        document.getElementById('captureCounter').textContent = `${this.capturesPerRoom}/${this.maxCapturesPerRoom} снимков`;
     }
 
     // Обновление навигации по комнатам
@@ -216,15 +269,18 @@ class TourForgeApp {
             // Захват кадра
             const imageData = this.cameraManager.captureFrame();
             
+            // Улучшение качества с помощью AI
+            const enhancedImage = await this.aiProcessor.enhanceImage(imageData);
+            
             // Классификация комнаты с помощью AI
-            const roomType = await this.aiProcessor.classifyRoom(imageData);
+            const roomType = await this.aiProcessor.classifyRoom(enhancedImage);
             
             // Сохранение изображения
             const imageInfo = {
-                data: imageData,
+                data: enhancedImage,
                 room: roomType,
                 timestamp: Date.now(),
-                angle: this.capturesPerRoom * 45,
+                angle: this.capturesPerRoom * 30,
                 coordinates: await this.roomManager.getCurrentCoordinates()
             };
             
@@ -264,7 +320,7 @@ class TourForgeApp {
             this.updateRoomNavigation();
             
             this.voiceGuide.speak(`Начинаем съемку ${this.rooms[this.currentRoomIndex]}. Встаньте в центре комнаты и медленно поворачивайтесь.`);
-            this.showOverlayInstruction(`Снимаем ${this.rooms[this.currentRoomIndex]}. Делайте снимки каждые 45 градусов.`);
+            this.showOverlayInstruction(`Снимаем ${this.rooms[this.currentRoomIndex]}. Делайте снимки каждые 30 градусов.`);
         } else {
             this.voiceGuide.speak("Все комнаты сфотографированы. Начинаем обработку.");
             this.showProcessingScreen();
@@ -279,7 +335,7 @@ class TourForgeApp {
             this.updateRoomNavigation();
             
             this.voiceGuide.speak(`Возвращаемся к съемке ${this.rooms[this.currentRoomIndex]}.`);
-            this.showOverlayInstruction(`Снимаем ${this.rooms[this.currentRoomIndex]}. Делайте снимки каждые 45 градусов.`);
+            this.showOverlayInstruction(`Снимаем ${this.rooms[this.currentRoomIndex]}. Делайте снимки каждые 30 градусов.`);
         }
     }
 
@@ -318,8 +374,30 @@ class TourForgeApp {
         // Генерация плана помещения
         await this.generateFloorPlan();
         
+        // Создание панорамы
+        await this.createPanorama();
+        
         // Показ результатов
         this.showResultScreen();
+    }
+
+    // Создание панорамы
+    async createPanorama() {
+        try {
+            this.showToast('Создание панорамы...', 'info');
+            
+            // В реальном приложении здесь будет логика сшивания изображений в панораму
+            // Сейчас используем заглушку
+            const panoramaData = await this.aiProcessor.createPanorama(this.capturedImages);
+            
+            // Сохраняем данные панорамы
+            this.panoramaData = panoramaData;
+            
+            this.showToast('Панорама успешно создана', 'success');
+        } catch (error) {
+            console.error('Panorama creation error:', error);
+            this.showToast('Ошибка при создании панорамы', 'error');
+        }
     }
 
     // Симуляция шага обработки
@@ -459,7 +537,8 @@ class TourForgeApp {
             date: new Date().toISOString(),
             preview: this.capturedImages[0]?.data || '',
             rooms: this.roomData,
-            images: this.capturedImages
+            images: this.capturedImages,
+            panorama: this.panoramaData
         };
         
         const tours = JSON.parse(localStorage.getItem('tours') || '[]');
@@ -545,6 +624,7 @@ class TourForgeApp {
             this.currentTourId = tourId;
             this.roomData = tour.rooms;
             this.capturedImages = tour.images;
+            this.panoramaData = tour.panorama;
             this.showTourViewerScreen();
         }
     }
@@ -552,60 +632,78 @@ class TourForgeApp {
     // Загрузка просмотрщика тура
     loadTourViewer() {
         const tourContainer = document.getElementById('tourContainer');
-        const hotspotsContainer = document.getElementById('tourHotspots');
         
-        // Симуляция загрузки
-        tourContainer.innerHTML = `
-            <div class="tour-loading">
-                <div class="loader"></div>
-                <p>Загрузка 3D тура...</p>
-            </div>
-        `;
+        // Очистка контейнера
+        tourContainer.innerHTML = '';
         
-        // Через 2 секунды "загружаем" тур
-        setTimeout(() => {
-            tourContainer.innerHTML = `
-                <div class="tour-content">
-                    <img src="${this.capturedImages[0]?.data}" alt="3D тур" style="width: 100%; height: 100%; object-fit: cover;">
-                </div>
+        // Создание контейнера для панорамы
+        const panoramaContainer = document.createElement('div');
+        panoramaContainer.id = 'panorama-container';
+        panoramaContainer.style.width = '100%';
+        panoramaContainer.style.height = '100%';
+        tourContainer.appendChild(panoramaContainer);
+        
+        // Инициализация панорамы
+        this.panoramaViewer.init(panoramaContainer, this.panoramaData);
+        
+        // Добавление горячих точек
+        this.addHotspots();
+    }
+
+    // Добавление горячих точек
+    addHotspots() {
+        const hotspotsContainer = document.querySelector('.panorama-hotspots');
+        hotspotsContainer.innerHTML = '';
+        
+        this.roomData.forEach(room => {
+            const hotspot = document.createElement('div');
+            hotspot.className = 'hotspot';
+            hotspot.dataset.target = room.name.toLowerCase();
+            hotspot.style.top = `${30 + Math.random() * 40}%`;
+            hotspot.style.left = `${20 + Math.random() * 60}%`;
+            
+            hotspot.innerHTML = `
+                <div class="hotspot-marker"></div>
+                <div class="hotspot-tooltip">${room.name}</div>
             `;
             
-            // Добавляем горячие точки
-            hotspotsContainer.innerHTML = this.roomData.map(room => `
-                <button class="btn btn-hotspot" data-room="${room.name.toLowerCase()}">
-                    <span class="btn-icon">${this.getRoomIcon(room.name)}</span>
-                    ${room.name}
-                </button>
-            `).join('');
-            
-            // Добавляем обработчики для горячих точек
-            document.querySelectorAll('.btn-hotspot').forEach(item => {
-                item.addEventListener('click', () => {
-                    const roomName = item.dataset.room;
-                    this.voiceGuide.speak(`Переходим к ${roomName}`);
-                    this.showToast(`Переход к ${roomName}`, 'info');
-                });
+            hotspot.addEventListener('click', () => {
+                this.navigateToPoint(room.name.toLowerCase());
             });
-        }, 2000);
+            
+            hotspotsContainer.appendChild(hotspot);
+        });
     }
 
-    // Увеличение
-    zoomIn() {
-        this.showToast('Увеличиваем', 'info');
+    // Навигация к точке
+    navigateToPoint(pointId) {
+        this.panoramaViewer.lookAtPoint(pointId);
+        this.showToast(`Переход к ${pointId}`, 'info');
     }
 
-    // Уменьшение
-    zoomOut() {
-        this.showToast('Уменьшаем', 'info');
+    // Вращение панорамы
+    rotatePanorama(angle) {
+        this.panoramaViewer.rotate(angle);
+    }
+
+    // Приближение панорамы
+    zoomPanorama(level) {
+        this.panoramaViewer.zoom(level);
+    }
+
+    // Переход к предыдущей точке
+    previousPoint() {
+        this.panoramaViewer.previousPoint();
+    }
+
+    // Переход к следующей точке
+    nextPoint() {
+        this.panoramaViewer.nextPoint();
     }
 
     // Полноэкранный режим
     toggleFullscreen() {
-        if (document.fullscreenElement) {
-            document.exitFullscreen();
-        } else {
-            document.documentElement.requestFullscreen();
-        }
+        this.panoramaViewer.toggleFullscreen();
     }
 
     // Поделиться туром
@@ -635,7 +733,8 @@ class TourForgeApp {
             if (exporter) {
                 const tourData = {
                     images: this.capturedImages,
-                    rooms: this.roomData
+                    rooms: this.roomData,
+                    panorama: this.panoramaData
                 };
                 
                 const result = await exporter.exportTour(tourData);
@@ -668,6 +767,7 @@ class TourForgeApp {
             this.currentTourId = tourId;
             this.roomData = tour.rooms;
             this.capturedImages = tour.images;
+            this.panoramaData = tour.panorama;
             
             // Показать модальное окно экспорта
             this.showExportModal();
@@ -689,7 +789,8 @@ class TourForgeApp {
         try {
             const tourData = {
                 images: this.capturedImages,
-                rooms: this.roomData
+                rooms: this.roomData,
+                panorama: this.panoramaData
             };
             
             const blob = await this.universalExporter.exportTour(tourData, 'zip');
@@ -831,7 +932,7 @@ class TourForgeApp {
         this.drawFloorPlan();
     }
 
-    // Остановка камеры
+    // Остановка камерой
     stopCamera() {
         this.cameraManager.stopCamera();
     }
@@ -1031,6 +1132,12 @@ class AIProcessor {
         }
     }
 
+    async enhanceImage(imageData) {
+        // В реальном приложении здесь будет улучшение качества изображения с помощью AI
+        // Сейчас просто возвращаем исходное изображение
+        return imageData;
+    }
+
     async classifyRoom(imageData) {
         if (!this.isModelLoaded) {
             // Простая логика если модель не загрузилась
@@ -1053,6 +1160,22 @@ class AIProcessor {
             console.error('Classification error:', error);
             return this.simpleRoomClassification(imageData);
         }
+    }
+
+    async createPanorama(images) {
+        // В реальном приложении здесь будет создание панорамы из нескольких изображений
+        // Сейчас возвращаем заглушку
+        return {
+            type: 'equirectangular',
+            panorama: 'https://pannellum.org/images/alma.jpg',
+            autoLoad: true,
+            hotspots: images.map((img, i) => ({
+                pitch: 0,
+                yaw: i * 30,
+                type: 'info',
+                text: `Снимок ${i + 1}`
+            }))
+        };
     }
 
     simpleRoomClassification(imageData) {
@@ -1154,6 +1277,64 @@ class PhoneSensorManager {
     }
 }
 
+// Класс панорамного просмотрщика
+class PanoramaViewer {
+    constructor() {
+        this.viewer = null;
+        this.currentPoint = 0;
+        this.points = [];
+    }
+
+    init(container, panoramaData) {
+        // Инициализация панорамного просмотрщика
+        this.viewer = pannellum.viewer(container, panoramaData);
+        
+        // Сохранение точек обзора
+        this.points = panoramaData.hotspots || [];
+    }
+
+    rotate(angle) {
+        if (this.viewer) {
+            const currentYaw = this.viewer.getYaw();
+            this.viewer.setYaw(currentYaw + angle);
+        }
+    }
+
+    zoom(level) {
+        if (this.viewer) {
+            const currentHfov = this.viewer.getHfov();
+            this.viewer.setHfov(currentHfov - level * 10);
+        }
+    }
+
+    lookAtPoint(pointId) {
+        const point = this.points.find(p => p.id === pointId);
+        if (point && this.viewer) {
+            this.viewer.lookAt(point.yaw, point.pitch, point.hfov);
+        }
+    }
+
+    previousPoint() {
+        if (this.points.length > 0) {
+            this.currentPoint = (this.currentPoint - 1 + this.points.length) % this.points.length;
+            this.lookAtPoint(this.points[this.currentPoint].id);
+        }
+    }
+
+    nextPoint() {
+        if (this.points.length > 0) {
+            this.currentPoint = (this.currentPoint + 1) % this.points.length;
+            this.lookAtPoint(this.points[this.currentPoint].id);
+        }
+    }
+
+    toggleFullscreen() {
+        if (this.viewer) {
+            this.viewer.toggleFullscreen();
+        }
+    }
+}
+
 // Базовый класс для экспорта на платформы
 class PlatformExporter {
     constructor() {
@@ -1165,7 +1346,7 @@ class PlatformExporter {
         };
     }
 
-    async exportTour(images, roomData) {
+    async exportTour(tourData) {
         // Базовая реализация, должна быть переопределена в дочерних классах
         return {
             success: true,
