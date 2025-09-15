@@ -9,16 +9,4 @@
   "theme_color": "#764ba2",
   "icons": [
     {
-      "src": "icons/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "icons/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png"
-    }
-  ],
-  "categories": ["lifestyle", "productivity"],
-  "lang": "ru"
-}
+      "src": "icons/icon
