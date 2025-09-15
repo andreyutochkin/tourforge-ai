@@ -221,3 +221,55 @@ class UniversalExporter {
         });
     }
 }
+class PhoneSensorManager {
+    constructor() {
+        this.orientation = { alpha: 0, beta: 0, gamma: 0 };
+        this.motion = { acceleration: { x: 0, y: 0, z: 0 } };
+        this.isSensorsAvailable = false;
+    }
+
+    async initializeSensors() {
+        try {
+            if (window.DeviceOrientationEvent) {
+                window.addEventListener('deviceorientation', (event) => {
+                    this.orientation = {
+                        alpha: event.alpha,
+                        beta: event.beta,
+                        gamma: event.gamma
+                    };
+                });
+            }
+
+            if (window.DeviceMotionEvent) {
+                window.addEventListener('devicemotion', (event) => {
+                    this.motion = {
+                        acceleration: event.acceleration,
+                        interval: event.interval
+                    };
+                });
+            }
+
+            this.isSensorsAvailable = true;
+            return true;
+        } catch (error) {
+            console.warn('Sensors not available:', error);
+            this.isSensorsAvailable = false;
+            return false;
+        }
+    }
+
+    getCurrentAngle() {
+        if (!this.isSensorsAvailable) {
+            return Math.random() * 360; // Fallback
+        }
+        return this.orientation.alpha || 0;
+    }
+
+    isDeviceSteady() {
+        if (!this.isSensorsAvailable) return true;
+        
+        const acc = this.motion.acceleration;
+        const movement = Math.sqrt(acc.x ** 2 + acc.y ** 2 + acc.z ** 2);
+        return movement < 2; // Порог стабильности
+    }
+}
