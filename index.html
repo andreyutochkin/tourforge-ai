@@ -9,6 +9,7 @@
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="icons/icon-192.png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/photoswipe@5.3.7/dist/photoswipe.css">
 </head>
 <body>
     <div class="app-container">
@@ -77,7 +78,7 @@
             </div>
 
             <footer class="app-footer">
-                <p>© 2023 TourForge AI · Версия 1.2.0</p>
+                <p>© 2023 TourForge AI · Версия 1.3.0</p>
             </footer>
         </div>
 
@@ -115,7 +116,7 @@
                 </button>
                 <h2>Съемка помещения</h2>
                 <div class="progress-indicator">
-                    <span id="currentStep">1</span>/<span id="totalSteps">8</span>
+                    <span id="currentStep">1</span>/<span id="totalSteps">12</span>
                 </div>
             </div>
 
@@ -146,6 +147,12 @@
                                 <p>Встаньте в центре комнаты и медленно поворачивайтесь на 360 градусов</p>
                             </div>
                             <div class="room-label" id="roomLabel">Гостиная</div>
+                            <div class="angle-indicator" id="angleIndicator">
+                                <span class="angle-text">0°</span>
+                                <div class="angle-circle">
+                                    <div class="angle-hand"></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -160,6 +167,10 @@
                         <button class="btn btn-capture" id="captureButton">
                             <span class="capture-icon"></span>
                         </button>
+
+                        <div class="capture-count">
+                            <span id="captureCounter">0/12 снимков</span>
+                        </div>
                     </div>
                 </div>
 
@@ -172,6 +183,16 @@
                         Следующая комната
                         <span class="btn-icon">→</span>
                     </button>
+                </div>
+
+                <div class="capture-tips">
+                    <h3>Советы для качественной съемки:</h3>
+                    <ul>
+                        <li>Держите телефон на уровне груди</li>
+                        <li>Поворачивайтесь медленно и плавно</li>
+                        <li>Следите за равномерным освещением</li>
+                        <li>Делайте снимки каждые 30 градусов</li>
+                    </ul>
                 </div>
             </div>
         </div>
@@ -329,32 +350,53 @@
 
             <div class="screen-content">
                 <div class="tour-container" id="tourContainer">
-                    <div class="tour-loading">
-                        <div class="loader"></div>
-                        <p>Загрузка 3D тура...</p>
+                    <div class="panorama-viewer" id="panoramaViewer">
+                        <div class="panorama-controls">
+                            <button class="btn btn-panorama-control" id="panoramaLeft">
+                                <span class="btn-icon">↶</span>
+                            </button>
+                            <button class="btn btn-panorama-control" id="panoramaRight">
+                                <span class="btn-icon">↷</span>
+                            </button>
+                            <button class="btn btn-panorama-control" id="panoramaZoomIn">
+                                <span class="btn-icon">+</span>
+                            </button>
+                            <button class="btn btn-panorama-control" id="panoramaZoomOut">
+                                <span class="btn-icon">-</span>
+                            </button>
+                        </div>
+                        <div class="panorama-hotspots">
+                            <div class="hotspot" data-target="living-room" style="top: 40%; left: 30%;">
+                                <div class="hotspot-marker"></div>
+                                <div class="hotspot-tooltip">Гостиная</div>
+                            </div>
+                            <div class="hotspot" data-target="kitchen" style="top: 60%; left: 70%;">
+                                <div class="hotspot-marker"></div>
+                                <div class="hotspot-tooltip">Кухня</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="tour-controls">
-                    <div class="control-group">
-                        <button class="btn btn-control" id="zoomIn">
-                            <span class="btn-icon">+</span>
-                        </button>
-                        <button class="btn btn-control" id="zoomOut">
-                            <span class="btn-icon">-</span>
-                        </button>
-                    </div>
-                    
-                    <div class="tour-hotspots" id="tourHotspots">
-                        <button class="btn btn-hotspot" data-room="living-room">
-                            <span class="btn-icon">🛋️</span>
-                            Гостиная
-                        </button>
-                        <button class="btn btn-hotspot" data-room="kitchen">
-                            <span class="btn-icon">👨‍🍳</span>
-                            Кухня
-                        </button>
-                    </div>
+                <div class="tour-info">
+                    <h3>Обзор помещения</h3>
+                    <p>Используйте жесты для навигации по туру:</p>
+                    <ul>
+                        <li>Перетаскивание - осмотр вокруг</li>
+                        <li>Колесико мыши или щипок - увеличение/уменьшение</li>
+                        <li>Клик по точкам интереса - переход между комнатами</li>
+                    </ul>
+                </div>
+
+                <div class="tour-navigation">
+                    <button class="btn btn-nav" id="prevPoint">
+                        <span class="btn-icon">←</span>
+                        Предыдущая точка
+                    </button>
+                    <button class="btn btn-nav" id="nextPoint">
+                        Следующая точка
+                        <span class="btn-icon">→</span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -474,8 +516,48 @@
     <!-- Уведомления -->
     <div class="toast-container" id="toastContainer"></div>
 
+    <!-- Фотосвиппер для галереи -->
+    <div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="pswp__bg"></div>
+        <div class="pswp__scroll-wrap">
+            <div class="pswp__container">
+                <div class="pswp__item"></div>
+                <div class="pswp__item"></div>
+                <div class="pswp__item"></div>
+            </div>
+            <div class="pswp__ui pswp__ui--hidden">
+                <div class="pswp__top-bar">
+                    <div class="pswp__counter"></div>
+                    <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                    <button class="pswp__button pswp__button--share" title="Share"></button>
+                    <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                    <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+                    <div class="pswp__preloader">
+                        <div class="pswp__preloader__icn">
+                            <div class="pswp__preloader__cut">
+                                <div class="pswp__preloader__donut"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                    <div class="pswp__share-tooltip"></div>
+                </div>
+                <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)"></button>
+                <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button>
+                <div class="pswp__caption">
+                    <div class="pswp__caption__center"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Скрипты -->
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.18.0"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/panolens@0.11.0/build/panolens.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/photoswipe@5.3.7/dist/photoswipe.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/photoswipe@5.3.7/dist/photoswipe-lightbox.umd.min.js"></script>
     <script src="script.js"></script>
     <script src="platforms/cian-export.js"></script>
     <script src="platforms/avito-export.js"></script>
