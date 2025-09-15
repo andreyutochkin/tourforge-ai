@@ -2,343 +2,198 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#3498db">
     <title>TourForge AI - Создание 3D туров</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        }
-
-        header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        h1 {
-            color: #2c3e50;
-            margin-bottom: 10px;
-            font-size: 2.5rem;
-        }
-
-        .subtitle {
-            color: #7f8c8d;
-            font-size: 1.2rem;
-            margin-bottom: 30px;
-        }
-
-        .features {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            margin: 30px 0;
-        }
-
-        .feature {
-            flex-basis: 30%;
-            text-align: center;
-            padding: 20px;
-            margin-bottom: 20px;
-            background: #f8f9fa;
-            border-radius: 10px;
-        }
-
-        .feature-icon {
-            font-size: 2.5rem;
-            margin-bottom: 15px;
-            color: #3498db;
-        }
-
-        .actions {
-            text-align: center;
-            margin: 40px 0;
-        }
-
-        .btn {
-            display: inline-block;
-            background: #3498db;
-            color: white;
-            padding: 15px 30px;
-            margin: 10px;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: bold;
-            transition: all 0.3s;
-            border: none;
-            cursor: pointer;
-            box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
-        }
-
-        .btn:hover {
-            background: #2980b9;
-            transform: translateY(-2px);
-            box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08);
-        }
-
-        .btn-secondary {
-            background: #2ecc71;
-        }
-
-        .btn-secondary:hover {
-            background: #27ae60;
-        }
-
-        /* Стили для страницы создания тура */
-        .upload-area {
-            border: 3px dashed #3498db;
-            border-radius: 10px;
-            padding: 40px;
-            text-align: center;
-            margin: 30px 0;
-            cursor: pointer;
-            transition: all 0.3s;
-            background: #ecf0f1;
-            display: none;
-        }
-
-        .upload-area:hover {
-            background: #d6eaf8;
-            border-color: #2980b9;
-        }
-
-        .upload-text {
-            color: #7f8c8d;
-            font-size: 1.2rem;
-            margin-bottom: 15px;
-        }
-
-        .processing {
-            text-align: center;
-            padding: 30px;
-            display: none;
-        }
-
-        .progress-bar {
-            height: 20px;
-            background: #ecf0f1;
-            border-radius: 10px;
-            margin: 20px 0;
-            overflow: hidden;
-        }
-
-        .progress {
-            height: 100%;
-            background: linear-gradient(to right, #3498db, #2ecc71);
-            width: 0%;
-            transition: width 0.5s;
-        }
-
-        .result {
-            text-align: center;
-            padding: 30px;
-            background: #e8f5e9;
-            border-radius: 10px;
-            display: none;
-            margin-top: 20px;
-        }
-
-        footer {
-            text-align: center;
-            margin-top: 40px;
-            color: #7f8c8d;
-            font-size: 0.9rem;
-        }
-
-        @media (max-width: 768px) {
-            .feature {
-                flex-basis: 100%;
-            }
-            
-            h1 {
-                font-size: 2rem;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="icons/icon-192.png">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>TourForge AI</h1>
-            <p class="subtitle">Создавайте профессиональные 3D туры с помощью искусственного интеллекта</p>
-        </header>
+    <div class="app-container">
+        <!-- Экран приветствия -->
+        <div class="screen" id="welcomeScreen">
+            <div class="header">
+                <h1>TourForge AI</h1>
+                <p>Создайте 3D тур вашей квартиры за несколько минут</p>
+            </div>
+            
+            <div class="features">
+                <div class="feature-item">
+                    <span class="icon">📸</span>
+                    <p>Снимайте комнаты с помощью камеры телефона</p>
+                </div>
+                <div class="feature-item">
+                    <span class="icon">🗺️</span>
+                    <p>Автоматическое создание плана помещения</p>
+                </div>
+                <div class="feature-item">
+                    <span class="icon">🎯</span>
+                    <p>Умные подсказки в реальном времени</p>
+                </div>
+            </div>
 
-        <div class="features">
-            <div class="feature">
-                <div class="feature-icon">📸</div>
-                <h3>Просто сфотографируйте</h3>
-                <p>Сделайте 360° фото помещения с помощью вашего смартфона</p>
-            </div>
-            <div class="feature">
-                <div class="feature-icon">🤖</div>
-                <h3>ИИ обработает</h3>
-                <p>Наш искусственный интеллект создаст интерактивный тур</p>
-            </div>
-            <div class="feature">
-                <div class="feature-icon">🚀</div>
-                <h3>Поделитесь результатом</h3>
-                <p>Отправьте ссылку на тур клиентам или опубликуйте на сайте</p>
-            </div>
-        </div>
-
-        <!-- Главный экран с кнопками -->
-        <div class="actions" id="mainScreen">
-            <button class="btn" id="startButton">Начать создание тура</button>
-            <button class="btn btn-secondary" id="examplesButton">Примеры работ</button>
+            <button class="btn-primary" id="startButton">Начать съемку</button>
         </div>
 
-        <!-- Экран загрузки фото -->
-        <div class="upload-area" id="uploadArea">
-            <p class="upload-text">Перетащите сюда 360° фото или нажмите для выбора</p>
-            <input type="file" id="fileInput" accept="image/*" multiple style="display: none;">
-            <button class="btn" id="selectButton">Выбрать файлы</button>
-        </div>
-        
-        <!-- Экран обработки -->
-        <div class="processing" id="processing">
-            <h3>Обработка изображений...</h3>
-            <p>Искусственный интеллект анализирует ваши фото и создаёт 3D тур</p>
-            <div class="progress-bar">
-                <div class="progress" id="progress"></div>
+        <!-- Экран съемки -->
+        <div class="screen" id="cameraScreen" style="display: none;">
+            <div class="camera-header">
+                <button class="btn-back" id="backButton">← Назад</button>
+                <h2>Съемка помещения</h2>
+                <div class="progress-indicator">
+                    <span id="currentStep">1</span>/<span id="totalSteps">5</span>
+                </div>
             </div>
-        </div>
-        
-        <!-- Экран результата -->
-        <div class="result" id="result">
-            <h2>Ваш 3D тур готов!</h2>
-            <p>Ссылка для просмотра: <a href="#" id="tourLink">https://tourforge.ai/tours/12345</a></p>
-            <div style="margin-top: 20px;">
-                <button class="btn" id="viewButton">Посмотреть тур</button>
-                <button class="btn btn-secondary" id="shareButton">Поделиться</button>
-                <button class="btn" id="backButton">Создать новый тур</button>
-            </div>
-        </div>
 
-        <footer>
-            <p>© 2023 TourForge AI. Все права защищены.</p>
-        </footer>
-    </div>
-    
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Элементы интерфейса
-            const mainScreen = document.getElementById('mainScreen');
-            const uploadArea = document.getElementById('uploadArea');
-            const processing = document.getElementById('processing');
-            const result = document.getElementById('result');
-            const startButton = document.getElementById('startButton');
-            const examplesButton = document.getElementById('examplesButton');
-            const selectButton = document.getElementById('selectButton');
-            const fileInput = document.getElementById('fileInput');
-            const progress = document.getElementById('progress');
-            const viewButton = document.getElementById('viewButton');
-            const shareButton = document.getElementById('shareButton');
-            const backButton = document.getElementById('backButton');
-            
-            // Обработчик кнопки "Начать создание тура"
-            startButton.addEventListener('click', function() {
-                mainScreen.style.display = 'none';
-                uploadArea.style.display = 'block';
-            });
-            
-            // Обработчик кнопки "Примеры работ"
-            examplesButton.addEventListener('click', function() {
-                alert('Здесь скоро появятся примеры работ');
-            });
-            
-            // Обработчик кнопки выбора файлов
-            selectButton.addEventListener('click', function() {
-                fileInput.click();
-            });
-            
-            // Обработчик выбора файлов
-            fileInput.addEventListener('change', function(e) {
-                if (e.target.files.length > 0) {
-                    uploadArea.style.display = 'none';
-                    processing.style.display = 'block';
-                    
-                    // Имитация процесса обработки
-                    let width = 0;
-                    const interval = setInterval(function() {
-                        if (width >= 100) {
-                            clearInterval(interval);
-                            processing.style.display = 'none';
-                            result.style.display = 'block';
-                        } else {
-                            width += 5;
-                            progress.style.width = width + '%';
-                        }
-                    }, 100);
-                }
-            });
-            
-            // Обработчик кнопки "Посмотреть тур"
-            viewButton.addEventListener('click', function() {
-                alert('Здесь будет открыт ваш тур в новом окне');
-            });
-            
-            // Обработчик кнопки "Поделиться"
-            shareButton.addEventListener('click', function() {
-                if (navigator.share) {
-                    navigator.share({
-                        title: 'Мой 3D тур',
-                        text: 'Посмотрите мой 3D тур, созданный с помощью TourForge AI',
-                        url: document.getElementById('tourLink').href
-                    })
-                    .catch(error => {
-                        alert('Ошибка при попытке поделиться: ' + error);
-                    });
-                } else {
-                    alert('Функция "Поделиться" недоступна в вашем браузере. Скопируйте ссылку вручную.');
-                }
-            });
-            
-            // Обработчик кнопки "Назад"
-            backButton.addEventListener('click', function() {
-                result.style.display = 'none';
-                mainScreen.style.display = 'block';
-                fileInput.value = '';
-            });
-            
-            // Обработчик перетаскивания файлов
-            uploadArea.addEventListener('dragover', function(e) {
-                e.preventDefault();
-                uploadArea.style.backgroundColor = '#d6eaf8';
-            });
-            
-            uploadArea.addEventListener('dragleave', function() {
-                uploadArea.style.backgroundColor = '#ecf0f1';
-            });
-            
-            uploadArea.addEventListener('drop', function(e) {
-                e.preventDefault();
-                uploadArea.style.backgroundColor = '#ecf0f1';
+            <div class="camera-container">
+                <video id="cameraView" autoplay playsinline></video>
+                <canvas id="previewCanvas" style="display: none;"></canvas>
                 
-                if (e.dataTransfer.files.length > 0) {
-                    fileInput.files = e.dataTransfer.files;
-                    const event = new Event('change');
-                    fileInput.dispatchEvent(event);
-                }
-            });
-        });
-    </script>
+                <div class="scanning-overlay">
+                    <div class="scanning-frame"></div>
+                    <div class="scanning-line"></div>
+                </div>
+
+                <div class="guidance-overlay">
+                    <div class="instruction-box" id="instructionBox">
+                        <p>Встаньте в центре комнаты и медленно поворачивайтесь на 360 градусов</p>
+                    </div>
+                    <div class="room-label" id="roomLabel">Гостиная</div>
+                </div>
+            </div>
+
+            <div class="camera-controls">
+                <button class="btn-capture" id="captureButton">
+                    <span class="capture-icon">📷</span>
+                </button>
+                
+                <div class="capture-progress">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <span id="progressText">0%</span>
+                </div>
+            </div>
+
+            <div class="hint-container">
+                <div class="hint-card">
+                    <h3>Совет:</h3>
+                    <p id="currentHint">Держите телефон на уровне груди и двигайтесь медленно</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Экран обработки -->
+        <div class="screen" id="processingScreen" style="display: none;">
+            <div class="processing-header">
+                <h2>Обработка данных</h2>
+                <p>ИИ анализирует ваши снимки и создает план помещения</p>
+            </div>
+
+            <div class="processing-animation">
+                <div class="ai-loader">
+                    <div class="ai-brain"></div>
+                    <div class="pulse-ring"></div>
+                    <div class="pulse-ring delay-1"></div>
+                    <div class="pulse-ring delay-2"></div>
+                </div>
+            </div>
+
+            <div class="processing-steps">
+                <div class="processing-step active">
+                    <span class="step-number">1</span>
+                    <span class="step-text">Анализ геометрии помещения</span>
+                    <div class="step-progress"></div>
+                </div>
+                <div class="processing-step">
+                    <span class="step-number">2</span>
+                    <span class="step-text">Определение комнат</span>
+                    <div class="step-progress"></div>
+                </div>
+                <div class="processing-step">
+                    <span class="step-number">3</span>
+                    <span class="step-text">Создание 3D модели</span>
+                    <div class="step-progress"></div>
+                </div>
+                <div class="processing-step">
+                    <span class="step-number">4</span>
+                    <span class="step-text">Генерация тура</span>
+                    <div class="step-progress"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Экран результатов -->
+        <div class="screen" id="resultScreen" style="display: none;">
+            <div class="result-header">
+                <h2>План помещения готов!</h2>
+                <p>Ваш 3D тур успешно создан</p>
+            </div>
+
+            <div class="floor-plan-container">
+                <canvas id="floorPlanCanvas" width="400" height="400"></canvas>
+                <div class="room-labels" id="roomLabels"></div>
+            </div>
+
+            <div class="room-list" id="roomList">
+                <h3>Обнаруженные помещения:</h3>
+                <div class="rooms-container">
+                    <!-- Сгенерируется автоматически -->
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn-secondary" id="editPlanButton">
+                    <span class="btn-icon">✏️</span>
+                    Редактировать план
+                </button>
+                <button class="btn-primary" id="viewTourButton">
+                    <span class="btn-icon">👁️</span>
+                    Посмотреть 3D тур
+                </button>
+                <button class="btn-share" id="shareButton">
+                    <span class="btn-icon">📤</span>
+                    Поделиться
+                </button>
+            </div>
+        </div>
+
+        <!-- Модальное окно редактирования -->
+        <div class="modal" id="editModal" style="display: none;">
+            <div class="modal-content">
+                <h3>Редактирование плана</h3>
+                <div class="edit-tools">
+                    <button class="edit-tool active" data-tool="select">Выбор</button>
+                    <button class="edit-tool" data-tool="wall">Стены</button>
+                    <button class="edit-tool" data-tool="door">Двери</button>
+                    <button class="edit-tool" data-tool="label">Подписи</button>
+                </div>
+                <div class="edit-area">
+                    <canvas id="editCanvas" width="400" height="400"></canvas>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn-secondary" id="cancelEdit">Отмена</button>
+                    <button class="btn-primary" id="saveEdit">Сохранить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Элементы управления камерой -->
+    <div class="camera-settings" style="display: none;">
+        <button id="switchCamera">🔄</button>
+        <button id="toggleFlash">⚡</button>
+    </div>
+
+    <!-- Уведомления -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Аудио элементы -->
+    <audio id="instructionSound" preload="auto"></audio>
+    <audio id="captureSound" preload="auto"></audio>
+    <audio id="successSound" preload="auto"></audio>
+
+    <script src="script.js"></script>
 </body>
 </html>
