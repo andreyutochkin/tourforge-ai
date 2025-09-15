@@ -11,38 +11,57 @@
 </head>
 <body>
     <div class="app-container">
-        <!-- Экран приветствия -->
-        <div class="screen" id="welcomeScreen">
+        <!-- Главный экран -->
+        <div class="screen" id="homeScreen">
             <div class="header">
                 <h1>TourForge AI</h1>
-                <p>Создайте 3D тур вашей квартиры за несколько минут</p>
+                <p>Профессиональные 3D туры для недвижимости</p>
             </div>
             
-            <div class="features">
-                <div class="feature-item">
-                    <span class="icon">📸</span>
-                    <p>Снимайте комнаты с помощью камеры телефона</p>
-                </div>
-                <div class="feature-item">
-                    <span class="icon">🗺️</span>
-                    <p>Автоматическое создание плана помещения</p>
-                </div>
-                <div class="feature-item">
-                    <span class="icon">🎯</span>
-                    <p>Умные подсказки в реальном времени</p>
-                </div>
+            <div class="main-actions">
+                <button class="btn-primary" id="startTour">
+                    <span class="icon">📷</span>
+                    Начать новую съемку
+                </button>
+                
+                <button class="btn-secondary" id="myTours">
+                    <span class="icon">📂</span>
+                    Мои туры
+                </button>
             </div>
 
-            <button class="btn-primary" id="startButton">Начать съемку</button>
+            <div class="platform-integration">
+                <h3>Публикация на платформах:</h3>
+                <div class="platform-icons">
+                    <span class="platform-icon">Циан</span>
+                    <span class="platform-icon">Авито</span>
+                    <span class="platform-icon">ДомКлик</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Экран списка туров -->
+        <div class="screen" id="toursScreen" style="display: none;">
+            <div class="screen-header">
+                <button class="btn-back" id="backFromTours">← Назад</button>
+                <h2>Мои туры</h2>
+            </div>
+
+            <div class="tours-list" id="toursList">
+                <div class="empty-state">
+                    <p>У вас пока нет созданных туров</p>
+                    <button class="btn-primary" id="createFirstTour">Создать первый тур</button>
+                </div>
+            </div>
         </div>
 
         <!-- Экран съемки -->
         <div class="screen" id="cameraScreen" style="display: none;">
             <div class="camera-header">
-                <button class="btn-back" id="backButton">← Назад</button>
+                <button class="btn-back" id="backFromCamera">← Назад</button>
                 <h2>Съемка помещения</h2>
                 <div class="progress-indicator">
-                    <span id="currentStep">1</span>/<span id="totalSteps">5</span>
+                    <span id="currentStep">1</span>/<span id="totalSteps">8</span>
                 </div>
             </div>
 
@@ -60,6 +79,9 @@
                         <p>Встаньте в центре комнаты и медленно поворачивайтесь на 360 градусов</p>
                     </div>
                     <div class="room-label" id="roomLabel">Гостиная</div>
+                    <div class="capture-hint" id="captureHint">
+                        <p>Нажимайте кнопку съемки каждые 45 градусов</p>
+                    </div>
                 </div>
             </div>
 
@@ -76,11 +98,9 @@
                 </div>
             </div>
 
-            <div class="hint-container">
-                <div class="hint-card">
-                    <h3>Совет:</h3>
-                    <p id="currentHint">Держите телефон на уровне груди и двигайтесь медленно</p>
-                </div>
+            <div class="room-navigation">
+                <button class="btn-nav" id="prevRoom" disabled>← Предыдущая комната</button>
+                <button class="btn-nav" id="nextRoom">Следующая комната →</button>
             </div>
         </div>
 
@@ -93,11 +113,12 @@
 
             <div class="processing-animation">
                 <div class="ai-loader">
-                    <div class="ai-brain"></div>
+                    <div class="ai-brain">🤖</div>
                     <div class="pulse-ring"></div>
                     <div class="pulse-ring delay-1"></div>
                     <div class="pulse-ring delay-2"></div>
                 </div>
+                <p class="ai-status" id="aiStatus">Анализируем геометрию помещения...</p>
             </div>
 
             <div class="processing-steps">
@@ -157,6 +178,40 @@
                     Поделиться
                 </button>
             </div>
+
+            <div class="platform-export">
+                <h3>Экспорт на платформы:</h3>
+                <div class="platform-buttons">
+                    <button class="btn-platform" data-platform="cian">Циан</button>
+                    <button class="btn-platform" data-platform="avito">Авито</button>
+                    <button class="btn-platform" data-platform="domclick">ДомКлик</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Экран просмотра тура -->
+        <div class="screen" id="tourViewerScreen" style="display: none;">
+            <div class="screen-header">
+                <button class="btn-back" id="backFromViewer">← Назад</button>
+                <h2>3D тур помещения</h2>
+            </div>
+
+            <div class="tour-container" id="tourContainer">
+                <div class="tour-loading">
+                    <p>Загрузка 3D тура...</p>
+                    <div class="loader"></div>
+                </div>
+            </div>
+
+            <div class="tour-controls">
+                <button class="btn-tour-control" id="zoomIn">+</button>
+                <button class="btn-tour-control" id="zoomOut">-</button>
+                <button class="btn-tour-control" id="fullscreen">⛶</button>
+            </div>
+
+            <div class="tour-hotspots" id="tourHotspots">
+                <!-- Генерируются автоматически -->
+            </div>
         </div>
 
         <!-- Модальное окно редактирования -->
@@ -167,10 +222,14 @@
                     <button class="edit-tool active" data-tool="select">Выбор</button>
                     <button class="edit-tool" data-tool="wall">Стены</button>
                     <button class="edit-tool" data-tool="door">Двери</button>
-                    <button class="edit-tool" data-tool="label">Подписи</button>
+                    <button class="edit-tool" data-tool="window">Окна</button>
+                    <button class="edit-tool" data-tool="furniture">Мебель</button>
                 </div>
                 <div class="edit-area">
                     <canvas id="editCanvas" width="400" height="400"></canvas>
+                </div>
+                <div class="edit-options" id="editOptions">
+                    <!-- Динамически генерируемые опции -->
                 </div>
                 <div class="modal-actions">
                     <button class="btn-secondary" id="cancelEdit">Отмена</button>
@@ -181,7 +240,7 @@
     </div>
 
     <!-- Элементы управления камерой -->
-    <div class="camera-settings" style="display: none;">
+    <div class="camera-settings">
         <button id="switchCamera">🔄</button>
         <button id="toggleFlash">⚡</button>
     </div>
@@ -194,6 +253,10 @@
     <audio id="captureSound" preload="auto"></audio>
     <audio id="successSound" preload="auto"></audio>
 
+    <!-- Загрузка скриптов -->
     <script src="script.js"></script>
+    <script src="platforms/cian-export.js"></script>
+    <script src="platforms/avito-export.js"></script>
+    <script src="platforms/domclick-export.js"></script>
 </body>
 </html>
