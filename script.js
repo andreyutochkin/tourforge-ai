@@ -1,4 +1,69 @@
-// Добавьте в начало файла
+class RoomManager {
+    constructor() {
+        this.currentRoom = null;
+        this.rooms = [];
+        this.capturedImages = [];
+    }
+
+    startNewRoom(roomType) {
+        this.currentRoom = {
+            type: roomType,
+            images: [],
+            timestamp: Date.now(),
+            coordinates: this.getCurrentCoordinates()
+        };
+        
+        return this.currentRoom;
+    }
+
+    async captureRoomImage() {
+        const imageData = this.cameraManager.captureFrame();
+        const roomType = await this.aiProcessor.classifyRoom(imageData);
+        
+        const imageInfo = {
+            data: imageData,
+            roomType: roomType,
+            timestamp: Date.now(),
+            angle: this.calculateCurrentAngle(),
+            coordinates: this.getCurrentCoordinates()
+        };
+        
+        this.currentRoom.images.push(imageInfo);
+        this.capturedImages.push(imageInfo);
+        
+        return imageInfo;
+    }
+
+    completeRoom() {
+        if (this.currentRoom && this.currentRoom.images.length > 0) {
+            this.rooms.push(this.currentRoom);
+            this.saveToLocalStorage();
+            this.currentRoom = null;
+            return true;
+        }
+        return false;
+    }
+
+    getCurrentCoordinates() {
+        return new Promise((resolve) => {
+            if (!navigator.geolocation) {
+                resolve({ lat: 0, lng: 0 });
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    resolve({
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    });
+                },
+                () => resolve({ lat: 0, lng: 0 }),
+                { timeout: 5000 }
+            );
+        });
+    }
+}// Добавьте в начало файла
 class CameraManager {
     constructor() {
         this.videoElement = document.getElementById('cameraView');
