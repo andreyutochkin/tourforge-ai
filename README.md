@@ -21,6 +21,11 @@
 
 ```bash
 # Клонирование репозитория
+# Запуск development сервера
+npm start
+
+# Или просто откройте index.html в браузере
+open index.html
 git clone https://github.com/andreyutochkin/tourforge-ai.git
 
 # Переход в директорию проекта
