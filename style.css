@@ -60,6 +60,7 @@ body {
     opacity: 0;
     transform: translateX(100%);
     pointer-events: none;
+    overflow-y: auto;
 }
 
 .screen.active {
@@ -71,8 +72,8 @@ body {
 /* Header styles */
 .header {
     text-align: center;
-    margin-bottom: 2rem;
-    padding-top: 1rem;
+    margin-bottom: 1rem;
+    padding-top: 0.5rem;
 }
 
 .logo-container {
@@ -80,15 +81,15 @@ body {
     align-items: center;
     justify-content: center;
     gap: 12px;
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
 }
 
 .logo-icon {
-    font-size: 2.5rem;
+    font-size: 2rem;
     background: linear-gradient(135deg, var(--primary), var(--secondary));
     border-radius: 50%;
-    width: 60px;
-    height: 60px;
+    width: 50px;
+    height: 50px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -96,7 +97,7 @@ body {
 }
 
 .header h1 {
-    font-size: 2.5rem;
+    font-size: 2rem;
     color: var(--white);
     font-weight: 700;
     margin: 0;
@@ -111,7 +112,7 @@ body {
 
 .subtitle {
     color: rgba(255, 255, 255, 0.8);
-    font-size: 1.1rem;
+    font-size: 0.9rem;
     font-weight: 400;
     max-width: 500px;
     margin: 0 auto;
@@ -123,46 +124,47 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    gap: 2rem;
+    gap: 1.5rem;
+    padding: 0.5rem 0;
 }
 
 .feature-cards {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1rem;
-    margin-bottom: 2rem;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0.8rem;
+    margin-bottom: 1.5rem;
 }
 
 .feature-card {
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(10px);
     border-radius: var(--radius);
-    padding: 1.5rem;
+    padding: 1rem;
     text-align: center;
     border: 1px solid rgba(255, 255, 255, 0.2);
     transition: var(--transition);
 }
 
 .feature-card:hover {
-    transform: translateY(-5px);
-    box-shadow: var(--shadow-lg);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow);
     border-color: rgba(255, 255, 255, 0.3);
 }
 
 .feature-icon {
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
 }
 
 .feature-card h3 {
     color: var(--white);
     margin-bottom: 0.5rem;
-    font-size: 1.2rem;
+    font-size: 1rem;
 }
 
 .feature-card p {
     color: rgba(255, 255, 255, 0.8);
-    font-size: 0.9rem;
+    font-size: 0.8rem;
 }
 
 /* Button styles */
@@ -181,6 +183,8 @@ body {
     outline: none;
     position: relative;
     overflow: hidden;
+    text-decoration: none;
+    user-select: none;
 }
 
 .btn::before {
@@ -255,45 +259,45 @@ body {
 .main-actions {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 0.8rem;
     margin: 1rem 0;
 }
 
 /* Platform integration */
 .platform-integration {
     text-align: center;
-    margin-top: 2rem;
+    margin-top: 1.5rem;
 }
 
 .platform-integration h3 {
     color: var(--white);
-    margin-bottom: 1rem;
-    font-size: 1.1rem;
+    margin-bottom: 0.8rem;
+    font-size: 1rem;
 }
 
 .platform-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 1rem;
-    margin-top: 1rem;
+    gap: 0.8rem;
+    margin-top: 0.8rem;
 }
 
 .platform-item {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.3rem;
 }
 
 .platform-logo {
-    width: 50px;
-    height: 50px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: bold;
-    font-size: 1.2rem;
+    font-size: 1rem;
     color: var(--white);
 }
 
@@ -315,31 +319,37 @@ body {
 
 .platform-item span {
     color: rgba(255, 255, 255, 0.8);
-    font-size: 0.8rem;
+    font-size: 0.7rem;
 }
 
 /* Screen header */
 .screen-header {
     display: flex;
     align-items: center;
-    margin-bottom: 1.5rem;
-    gap: 1rem;
+    margin-bottom: 1rem;
+    gap: 0.8rem;
+    position: sticky;
+    top: 0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 0.5rem 0;
+    z-index: 10;
 }
 
 .screen-header h2 {
     color: var(--white);
-    font-size: 1.8rem;
+    font-size: 1.5rem;
     margin: 0;
     flex: 1;
 }
 
 .progress-indicator {
     background: rgba(255, 255, 255, 0.2);
-    padding: 0.5rem 1rem;
+    padding: 0.4rem 0.8rem;
     border-radius: 20px;
     color: var(--white);
     font-weight: 600;
     backdrop-filter: blur(10px);
+    font-size: 0.9rem;
 }
 
 /* Screen content */
@@ -363,9 +373,10 @@ body {
     flex: 1;
     border-radius: var(--radius-lg);
     overflow: hidden;
-    margin: 1rem 0;
+    margin: 0.8rem 0;
     background: #000;
     box-shadow: var(--shadow-lg);
+    min-height: 50vh;
 }
 
 .camera-view {
@@ -436,11 +447,11 @@ body {
 
 .dot {
     position: absolute;
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
     background: #00ff88;
     border-radius: 50%;
-    box-shadow: 0 0 10px rgba(0, 255, 136, 0.8);
+    box-shadow: 0 0 8px rgba(0, 255, 136, 0.8);
 }
 
 .dot:nth-child(1) { top: 10%; left: 10%; }
@@ -454,20 +465,20 @@ body {
 
 .guidance-overlay {
     position: absolute;
-    bottom: 20%;
+    bottom: 15%;
     left: 0;
     width: 100%;
-    padding: 1rem;
+    padding: 0.8rem;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1rem;
+    gap: 0.8rem;
 }
 
 .instruction-box {
     background: rgba(0, 0, 0, 0.8);
     color: var(--white);
-    padding: 1rem 1.5rem;
+    padding: 0.8rem 1.2rem;
     border-radius: 15px;
     text-align: center;
     backdrop-filter: blur(10px);
@@ -476,48 +487,84 @@ body {
 }
 
 .instruction-icon {
-    font-size: 1.5rem;
-    margin-bottom: 0.5rem;
+    font-size: 1.2rem;
+    margin-bottom: 0.3rem;
 }
 
 .room-label {
     background: linear-gradient(135deg, var(--primary), var(--primary-dark));
     color: var(--white);
-    padding: 0.5rem 1.5rem;
+    padding: 0.4rem 1.2rem;
     border-radius: 20px;
     font-weight: 600;
     text-align: center;
     backdrop-filter: blur(10px);
     box-shadow: var(--shadow);
+    font-size: 0.9rem;
+}
+
+.angle-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(0, 0, 0, 0.6);
+    padding: 0.5rem 0.8rem;
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+}
+
+.angle-text {
+    color: var(--white);
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.angle-circle {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 2px solid var(--white);
+    position: relative;
+}
+
+.angle-hand {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 2px;
+    height: 12px;
+    background: var(--white);
+    transform-origin: bottom center;
+    transform: translate(-50%, -100%) rotate(0deg);
 }
 
 .camera-controls {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1rem;
-    margin: 1rem 0;
-    padding: 0 1rem;
+    gap: 0.8rem;
+    margin: 0.8rem 0;
+    padding: 0 0.8rem;
 }
 
 .capture-progress {
     width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.4rem;
 }
 
 .progress-text {
     color: var(--white);
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     text-align: center;
 }
 
 .progress-bar {
     width: 100%;
-    height: 8px;
+    height: 6px;
     background: rgba(255, 255, 255, 0.3);
-    border-radius: 4px;
+    border-radius: 3px;
     overflow: hidden;
 }
 
@@ -526,7 +573,7 @@ body {
     background: linear-gradient(135deg, #00ff88, #00cc6a);
     width: 0%;
     transition: width 0.3s ease;
-    border-radius: 4px;
+    border-radius: 3px;
     position: relative;
     overflow: hidden;
 }
@@ -548,11 +595,11 @@ body {
 }
 
 .btn-capture {
-    width: 70px;
-    height: 70px;
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
     background: linear-gradient(135deg, #ff6b6b, #ee5a52);
-    border: 4px solid var(--white);
+    border: 3px solid var(--white);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -594,18 +641,49 @@ body {
 }
 
 .capture-icon {
-    width: 30px;
-    height: 30px;
+    width: 25px;
+    height: 25px;
     background: var(--white);
     border-radius: 50%;
+}
+
+.capture-count {
+    color: var(--white);
+    font-size: 0.8rem;
+    text-align: center;
+}
+
+.capture-tips {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: var(--radius);
+    padding: 1rem;
+    margin-top: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.capture-tips h3 {
+    color: var(--white);
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+}
+
+.capture-tips ul {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.8rem;
+    padding-left: 1.2rem;
+}
+
+.capture-tips li {
+    margin-bottom: 0.3rem;
 }
 
 .room-navigation {
     display: flex;
     justify-content: space-between;
-    gap: 1rem;
+    gap: 0.8rem;
     margin-top: 1rem;
-    padding: 0 1rem;
+    padding: 0 0.5rem;
 }
 
 .btn-nav {
@@ -613,9 +691,9 @@ body {
     background: rgba(255, 255, 255, 0.1);
     color: var(--white);
     border: 1px solid rgba(255, 255, 255, 0.3);
-    padding: 0.8rem 1rem;
+    padding: 0.7rem 0.8rem;
     border-radius: 20px;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     cursor: pointer;
     backdrop-filter: blur(10px);
     transition: var(--transition);
@@ -637,20 +715,20 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
 }
 
 .ai-loader {
     position: relative;
-    width: 100px;
-    height: 100px;
-    margin-bottom: 1.5rem;
+    width: 80px;
+    height: 80px;
+    margin-bottom: 1rem;
 }
 
 .ai-brain {
-    width: 60px;
-    height: 60px;
-    font-size: 3rem;
+    width: 50px;
+    height: 50px;
+    font-size: 2.5rem;
     border-radius: 50%;
     position: absolute;
     top: 50%;
@@ -669,8 +747,8 @@ body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 80px;
-    height: 80px;
+    width: 70px;
+    height: 70px;
     border: 2px solid var(--primary);
     border-radius: 50%;
     opacity: 0;
@@ -699,32 +777,33 @@ body {
 .processing-animation h2 {
     color: var(--white);
     margin-bottom: 0.5rem;
-    font-size: 1.8rem;
+    font-size: 1.5rem;
 }
 
 .ai-status {
     color: rgba(255, 255, 255, 0.8);
     text-align: center;
     max-width: 300px;
+    font-size: 0.9rem;
 }
 
 .processing-steps {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 0.8rem;
     width: 100%;
-    max-width: 400px;
+    max-width: 350px;
 }
 
 .processing-step {
     display: flex;
     align-items: center;
     background: rgba(255, 255, 255, 0.1);
-    padding: 1rem;
+    padding: 0.8rem;
     border-radius: var(--radius);
     border: 1px solid rgba(255, 255, 255, 0.2);
     transition: var(--transition);
-    gap: 1rem;
+    gap: 0.8rem;
 }
 
 .processing-step.active {
@@ -734,8 +813,8 @@ body {
 
 .step-indicator {
     position: relative;
-    width: 25px;
-    height: 25px;
+    width: 22px;
+    height: 22px;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -743,6 +822,7 @@ body {
     font-weight: 600;
     background: rgba(255, 255, 255, 0.2);
     color: var(--white);
+    font-size: 0.8rem;
 }
 
 .step-check {
@@ -769,12 +849,12 @@ body {
 .step-text {
     color: var(--white);
     flex: 1;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
 }
 
 .step-progress {
-    width: 30px;
-    height: 4px;
+    width: 25px;
+    height: 3px;
     background: rgba(255, 255, 255, 0.3);
     border-radius: 2px;
     overflow: hidden;
@@ -798,30 +878,30 @@ body {
 /* Result screen */
 .success-message {
     text-align: center;
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
 }
 
 .success-icon {
-    font-size: 4rem;
-    margin-bottom: 1rem;
+    font-size: 3rem;
+    margin-bottom: 0.8rem;
     animation: bounce 1s infinite alternate;
 }
 
 @keyframes bounce {
     0% { transform: translateY(0); }
-    100% { transform: translateY(-10px); }
+    100% { transform: translateY(-8px); }
 }
 
 .success-message p {
     color: var(--white);
-    font-size: 1.1rem;
+    font-size: 1rem;
 }
 
 .result-content {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 2rem;
-    margin-bottom: 2rem;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
 }
 
 @media (min-width: 768px) {
@@ -833,16 +913,16 @@ body {
 .floor-plan-section h3,
 .room-details-section h3 {
     color: var(--white);
-    margin-bottom: 1rem;
-    font-size: 1.2rem;
+    margin-bottom: 0.8rem;
+    font-size: 1.1rem;
 }
 
 .floor-plan-container {
     background: var(--white);
     border-radius: var(--radius);
-    padding: 1rem;
+    padding: 0.8rem;
     box-shadow: var(--shadow);
-    height: 300px;
+    height: 250px;
     position: relative;
     overflow: hidden;
 }
@@ -866,9 +946,9 @@ body {
     position: absolute;
     background: linear-gradient(135deg, var(--primary), var(--primary-dark));
     color: var(--white);
-    padding: 0.5rem 1rem;
-    border-radius: 15px;
-    font-size: 0.8rem;
+    padding: 0.4rem 0.8rem;
+    border-radius: 12px;
+    font-size: 0.7rem;
     font-weight: 600;
     transform: translate(-50%, -50%);
     box-shadow: var(--shadow);
@@ -876,19 +956,19 @@ body {
 
 .rooms-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 0.8rem;
 }
 
 .room-item {
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(10px);
-    padding: 1rem;
+    padding: 0.8rem;
     border-radius: var(--radius);
     border: 1px solid rgba(255, 255, 255, 0.2);
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 0.6rem;
     transition: var(--transition);
 }
 
@@ -898,7 +978,7 @@ body {
 }
 
 .room-icon {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
 }
 
 .room-info {
@@ -908,55 +988,56 @@ body {
 .room-name {
     color: var(--white);
     font-weight: 600;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
 }
 
 .room-area {
     color: rgba(255, 255, 255, 0.7);
-    font-size: 0.8rem;
+    font-size: 0.7rem;
 }
 
 .action-buttons {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 1rem;
-    margin-bottom: 2rem;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 0.8rem;
+    margin-bottom: 1.5rem;
 }
 
 .platform-export {
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(10px);
-    padding: 1.5rem;
+    padding: 1.2rem;
     border-radius: var(--radius);
     border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .platform-export h3 {
     color: var(--white);
-    margin-bottom: 1rem;
+    margin-bottom: 0.8rem;
     text-align: center;
+    font-size: 1rem;
 }
 
 .platform-buttons {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 0.75rem;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 0.6rem;
 }
 
 .btn-platform {
     background: rgba(255, 255, 255, 0.1);
     color: var(--white);
     border: 1px solid rgba(255, 255, 255, 0.3);
-    padding: 0.75rem 1rem;
+    padding: 0.6rem 0.8rem;
     border-radius: 50px;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     cursor: pointer;
     backdrop-filter: blur(10px);
     transition: var(--transition);
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
+    gap: 0.4rem;
 }
 
 .btn-platform:hover {
@@ -989,99 +1070,137 @@ body {
     flex: 1;
     background: #000;
     border-radius: var(--radius);
-    margin: 1rem 0;
+    margin: 0.8rem 0;
     overflow: hidden;
     position: relative;
-    height: 400px;
+    height: 350px;
 }
 
-.tour-loading {
+.panorama-viewer {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.panorama-controls {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 0.5rem;
+    z-index: 10;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 0.5rem;
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+}
+
+.btn-panorama-control {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    color: var(--white);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    font-size: 1.2rem;
+    cursor: pointer;
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+}
+
+.btn-panorama-control:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+.panorama-hotspots {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background: rgba(0, 0, 0, 0.7);
-    color: var(--white);
+    pointer-events: none;
 }
 
-.loader {
-    width: 40px;
-    height: 40px;
-    border: 4px solid rgba(255, 255, 255, 0.3);
-    border-top: 4px solid var(--primary);
+.hotspot {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+    pointer-events: all;
+    z-index: 5;
+}
+
+.hotspot-marker {
+    width: 20px;
+    height: 20px;
     border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin-bottom: 1rem;
+    background: rgba(255, 255, 255, 0.8);
+    border: 2px solid var(--primary);
+    position: relative;
+    animation: pulse 2s infinite;
 }
 
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+.hotspot-tooltip {
+    position: absolute;
+    top: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: var(--white);
+    padding: 0.3rem 0.6rem;
+    border-radius: 8px;
+    font-size: 0.7rem;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
 }
 
-.tour-controls {
+.hotspot:hover .hotspot-tooltip {
+    opacity: 1;
+}
+
+.tour-info {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: var(--radius);
+    padding: 1rem;
+    margin: 0.8rem 0;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.tour-info h3 {
+    color: var(--white);
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+}
+
+.tour-info p {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.8rem;
+    margin-bottom: 0.5rem;
+}
+
+.tour-info ul {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.8rem;
+    padding-left: 1.2rem;
+}
+
+.tour-info li {
+    margin-bottom: 0.3rem;
+}
+
+.tour-navigation {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    margin: 1rem 0;
-    gap: 1rem;
-}
-
-.control-group {
-    display: flex;
-    gap: 0.5rem;
-}
-
-.btn-control {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.1);
-    color: var(--white);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    font-size: 1.5rem;
-    cursor: pointer;
-    backdrop-filter: blur(10px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: var(--transition);
-}
-
-.btn-control:hover {
-    background: rgba(255, 255, 255, 0.2);
-    transform: translateY(-2px);
-}
-
-.tour-hotspots {
-    display: flex;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-}
-
-.btn-hotspot {
-    background: rgba(255, 255, 255, 0.1);
-    color: var(--white);
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    cursor: pointer;
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    transition: var(--transition);
-}
-
-.btn-hotspot:hover {
-    background: rgba(255, 255, 255, 0.2);
-    transform: translateY(-2px);
+    gap: 0.8rem;
+    margin-top: 0.8rem;
 }
 
 /* Modal styles */
@@ -1098,6 +1217,7 @@ body {
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.3s ease;
+    padding: 1rem;
 }
 
 .modal.active {
@@ -1134,7 +1254,7 @@ body {
 }
 
 .modal-header {
-    padding: 1.5rem;
+    padding: 1.2rem;
     border-bottom: 1px solid var(--border);
     display: flex;
     align-items: center;
@@ -1144,6 +1264,7 @@ body {
 .modal-header h3 {
     margin: 0;
     color: var(--text);
+    font-size: 1.2rem;
 }
 
 .btn-close {
@@ -1163,38 +1284,39 @@ body {
 }
 
 .modal-body {
-    padding: 1.5rem;
+    padding: 1.2rem;
     overflow-y: auto;
     max-height: 50vh;
 }
 
 .modal-footer {
-    padding: 1.5rem;
+    padding: 1.2rem;
     border-top: 1px solid var(--border);
     display: flex;
-    gap: 1rem;
+    gap: 0.8rem;
     justify-content: flex-end;
 }
 
 /* Edit tools */
 .edit-tools {
     display: flex;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
+    gap: 0.4rem;
+    margin-bottom: 0.8rem;
     flex-wrap: wrap;
+    justify-content: center;
 }
 
 .btn-tool {
     background: var(--bg-light);
     color: var(--text);
     border: 1px solid var(--border);
-    padding: 0.5rem 1rem;
+    padding: 0.4rem 0.8rem;
     border-radius: 50px;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.4rem;
     transition: var(--transition);
 }
 
@@ -1207,10 +1329,10 @@ body {
 
 .edit-area {
     width: 100%;
-    height: 300px;
+    height: 250px;
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    margin-bottom: 1rem;
+    margin-bottom: 0.8rem;
     overflow: hidden;
 }
 
@@ -1220,17 +1342,18 @@ body {
 }
 
 .edit-options {
-    margin-bottom: 1rem;
+    margin-bottom: 0.8rem;
 }
 
 .option-group {
-    margin-bottom: 1rem;
+    margin-bottom: 0.8rem;
 }
 
 .option-group label {
     display: block;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.3rem;
     color: var(--text);
+    font-size: 0.8rem;
     font-weight: 500;
 }
 
@@ -1240,15 +1363,15 @@ body {
     padding: 0.5rem;
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    font-size: 1rem;
+    font-size: 0.9rem;
 }
 
 /* Export options */
 .export-options {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 1rem;
-    margin-bottom: 2rem;
+    gap: 0.8rem;
+    margin-bottom: 1.5rem;
 }
 
 @media (min-width: 768px) {
@@ -1259,25 +1382,26 @@ body {
 
 .option-card {
     background: var(--bg-light);
-    padding: 1.5rem;
+    padding: 1.2rem;
     border-radius: var(--radius);
     text-align: center;
 }
 
 .option-icon {
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
+    font-size: 2rem;
+    margin-bottom: 0.8rem;
 }
 
 .option-card h4 {
     margin: 0 0 0.5rem 0;
     color: var(--text);
+    font-size: 1rem;
 }
 
 .option-card p {
     color: var(--text-light);
-    margin-bottom: 1rem;
-    font-size: 0.9rem;
+    margin-bottom: 0.8rem;
+    font-size: 0.8rem;
 }
 
 /* Toast notifications */
@@ -1294,12 +1418,12 @@ body {
 .toast {
     background: var(--white);
     color: var(--text);
-    padding: 1rem 1.5rem;
+    padding: 0.8rem 1.2rem;
     border-radius: var(--radius);
     box-shadow: var(--shadow-lg);
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 0.6rem;
     animation: toastIn 0.3s ease-out;
     max-width: 350px;
 }
@@ -1357,11 +1481,12 @@ body {
 
 .toast-title {
     font-weight: 600;
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.2rem;
+    font-size: 0.9rem;
 }
 
 .toast-message {
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     color: var(--text-light);
 }
 
@@ -1384,19 +1509,42 @@ body {
 /* App footer */
 .app-footer {
     text-align: center;
-    margin-top: 2rem;
-    padding: 1rem 0;
+    margin-top: 1.5rem;
+    padding: 0.8rem 0;
     color: rgba(255, 255, 255, 0.6);
-    font-size: 0.8rem;
+    font-size: 0.7rem;
 }
 
 /* Responsive design */
 @media (max-width: 768px) {
+    .screen {
+        padding: 15px;
+    }
+    
+    .header {
+        margin-bottom: 0.8rem;
+    }
+    
+    .logo-container {
+        flex-direction: column;
+        gap: 0.4rem;
+    }
+    
     .header h1 {
-        font-size: 2rem;
+        font-size: 1.8rem;
     }
     
     .subtitle {
+        font-size: 0.8rem;
+    }
+    
+    .btn {
+        padding: 0.6rem 1.2rem;
+        font-size: 0.9rem;
+    }
+    
+    .btn-large {
+        padding: 0.8rem 1.5rem;
         font-size: 1rem;
     }
     
@@ -1418,49 +1566,83 @@ body {
     
     .modal-content {
         width: 95%;
-        margin: 1rem;
+        margin: 0.5rem;
     }
     
     .export-options {
         grid-template-columns: 1fr;
     }
+    
+    .camera-controls {
+        gap: 0.6rem;
+    }
+    
+    .btn-capture {
+        width: 55px;
+        height: 55px;
+    }
 }
 
 @media (max-width: 480px) {
     .screen {
-        padding: 15px;
+        padding: 10px;
     }
     
-    .header {
-        margin-bottom: 1.5rem;
-    }
-    
-    .logo-container {
-        flex-direction: column;
-        gap: 0.5rem;
-    }
-    
-    .header h1 {
+    .logo-icon {
+        width: 45px;
+        height: 45px;
         font-size: 1.8rem;
     }
     
-    .btn {
-        padding: 0.6rem 1.2rem;
+    .header h1 {
+        font-size: 1.6rem;
+    }
+    
+    .screen-header h2 {
+        font-size: 1.3rem;
+    }
+    
+    .progress-indicator {
+        font-size: 0.8rem;
+        padding: 0.3rem 0.6rem;
+    }
+    
+    .platform-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.5rem;
+    }
+    
+    .platform-logo {
+        width: 35px;
+        height: 35px;
         font-size: 0.9rem;
     }
     
-    .btn-large {
-        padding: 0.8rem 1.5rem;
-        font-size: 1rem;
+    .platform-item span {
+        font-size: 0.6rem;
     }
     
-    .camera-controls {
-        gap: 0.8rem;
+    .instruction-box {
+        padding: 0.6rem 1rem;
+        font-size: 0.9rem;
     }
     
-    .btn-capture {
-        width: 60px;
-        height: 60px;
+    .room-label {
+        font-size: 0.8rem;
+        padding: 0.3rem 1rem;
+    }
+    
+    .angle-indicator {
+        padding: 0.4rem 0.6rem;
+    }
+    
+    .angle-circle {
+        width: 25px;
+        height: 25px;
+    }
+    
+    .angle-hand {
+        height: 10px;
     }
 }
 
@@ -1516,4 +1698,23 @@ body {
     clip: rect(0, 0, 0, 0);
     white-space: nowrap;
     border: 0;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
 }
