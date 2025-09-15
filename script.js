@@ -21,3 +21,35 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log('TourForge AI инициализирован!');
 });
+// Функция для запуска камеры
+async function startCamera() {
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ 
+            video: { 
+                facingMode: { exact: "environment" } // Используем заднюю камеру
+            },
+            audio: false 
+        });
+        const videoElement = document.createElement('video');
+        videoElement.srcObject = stream;
+        videoElement.setAttribute('playsinline', '');
+        videoElement.play();
+        
+        // Добавляем видео в интерфейс
+        const cameraContainer = document.getElementById('cameraContainer');
+        cameraContainer.innerHTML = '';
+        cameraContainer.appendChild(videoElement);
+        
+        return videoElement;
+    } catch (error) {
+        console.error('Ошибка доступа к камере:', error);
+        alert('Не удалось получить доступ к камере. Проверьте разрешения.');
+        return null;
+    }
+}
+
+// Кнопка для запуска камеры
+const cameraButton = document.getElementById('cameraButton');
+if (cameraButton) {
+    cameraButton.addEventListener('click', startCamera);
+}
