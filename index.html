@@ -8,74 +8,478 @@
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="icons/icon-192.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="app-container">
         <!-- Главный экран -->
         <div class="screen active" id="homeScreen">
             <div class="header">
-                <h1>TourForge AI</h1>
-                <p>Профессиональные 3D туры для недвижимости</p>
+                <div class="logo-container">
+                    <div class="logo-icon">🏠</div>
+                    <h1>TourForge <span class="ai-text">AI</span></h1>
+                </div>
+                <p class="subtitle">Создавайте профессиональные 3D туры с помощью искусственного интеллекта</p>
             </div>
             
-            <div class="main-actions">
-                <button class="btn-primary" id="startTour">
-                    <span class="icon">📷</span>
-                    Начать новую съемку
-                </button>
-                
-                <button class="btn-secondary" id="myTours">
-                    <span class="icon">📂</span>
-                    Мои туры
-                </button>
+            <div class="main-content">
+                <div class="feature-cards">
+                    <div class="feature-card">
+                        <div class="feature-icon">📷</div>
+                        <h3>Простая съемка</h3>
+                        <p>Снимайте помещения с помощью камеры вашего телефона</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🧠</div>
+                        <h3>AI обработка</h3>
+                        <p>Автоматическое определение комнат и объектов</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🚀</div>
+                        <h3>Быстрый экспорт</h3>
+                        <p>Подготовка для всех популярных платформ недвижимости</p>
+                    </div>
+                </div>
+
+                <div class="main-actions">
+                    <button class="btn btn-primary btn-large" id="startTour">
+                        <span class="btn-icon">📷</span>
+                        Начать новую съемку
+                    </button>
+                    
+                    <button class="btn btn-secondary" id="myTours">
+                        <span class="btn-icon">📂</span>
+                        Мои туры
+                    </button>
+                </div>
             </div>
 
             <div class="platform-integration">
-                <h3>Поддержка платформ:</h3>
-                <div class="platform-icons">
-                    <span class="platform-icon">Яндекс</span>
-                    <span class="platform-icon">Циан</span>
-                    <span class="platform-icon">Авито</span>
-                    <span class="platform-icon">ДомКлик</span>
+                <h3>Поддерживаемые платформы</h3>
+                <div class="platform-grid">
+                    <div class="platform-item">
+                        <div class="platform-logo yandex">Я</div>
+                        <span>Яндекс</span>
+                    </div>
+                    <div class="platform-item">
+                        <div class="platform-logo cian">Ц</div>
+                        <span>Циан</span>
+                    </div>
+                    <div class="platform-item">
+                        <div class="platform-logo avito">А</div>
+                        <span>Авито</span>
+                    </div>
+                    <div class="platform-item">
+                        <div class="platform-logo domclick">Д</div>
+                        <span>ДомКлик</span>
+                    </div>
+                </div>
+            </div>
+
+            <footer class="app-footer">
+                <p>© 2023 TourForge AI · Версия 1.2.0</p>
+            </footer>
+        </div>
+
+        <!-- Экран списка туров -->
+        <div class="screen" id="toursScreen">
+            <div class="screen-header">
+                <button class="btn btn-back" id="backFromTours">
+                    <span class="btn-icon">←</span>
+                    Назад
+                </button>
+                <h2>Мои туры</h2>
+            </div>
+
+            <div class="screen-content">
+                <div class="tours-container" id="toursList">
+                    <div class="empty-state">
+                        <div class="empty-icon">📂</div>
+                        <h3>У вас пока нет созданных туров</h3>
+                        <p>Начните с создания вашего первого 3D тура</p>
+                        <button class="btn btn-primary" id="createFirstTour">
+                            <span class="btn-icon">📷</span>
+                            Создать первый тур
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Остальные экраны остаются без изменений -->
-        <!-- ... -->
+        <!-- Экран съемки -->
+        <div class="screen" id="cameraScreen">
+            <div class="screen-header">
+                <button class="btn btn-back" id="backFromCamera">
+                    <span class="btn-icon">←</span>
+                    Назад
+                </button>
+                <h2>Съемка помещения</h2>
+                <div class="progress-indicator">
+                    <span id="currentStep">1</span>/<span id="totalSteps">8</span>
+                </div>
+            </div>
+
+            <div class="screen-content">
+                <div class="camera-container">
+                    <div class="camera-view" id="cameraViewContainer">
+                        <video id="cameraView" autoplay playsinline></video>
+                        <canvas id="previewCanvas" style="display: none;"></canvas>
+                        
+                        <div class="scanning-overlay">
+                            <div class="scanning-frame"></div>
+                            <div class="scanning-line"></div>
+                            <div class="scanning-dots">
+                                <div class="dot"></div>
+                                <div class="dot"></div>
+                                <div class="dot"></div>
+                                <div class="dot"></div>
+                                <div class="dot"></div>
+                                <div class="dot"></div>
+                                <div class="dot"></div>
+                                <div class="dot"></div>
+                            </div>
+                        </div>
+
+                        <div class="guidance-overlay">
+                            <div class="instruction-box" id="instructionBox">
+                                <div class="instruction-icon">🎯</div>
+                                <p>Встаньте в центре комнаты и медленно поворачивайтесь на 360 градусов</p>
+                            </div>
+                            <div class="room-label" id="roomLabel">Гостиная</div>
+                        </div>
+                    </div>
+
+                    <div class="camera-controls">
+                        <div class="capture-progress">
+                            <div class="progress-text" id="progressText">0% завершено</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="progressFill"></div>
+                            </div>
+                        </div>
+                        
+                        <button class="btn btn-capture" id="captureButton">
+                            <span class="capture-icon"></span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="room-navigation">
+                    <button class="btn btn-nav" id="prevRoom" disabled>
+                        <span class="btn-icon">←</span>
+                        Предыдущая комната
+                    </button>
+                    <button class="btn btn-nav" id="nextRoom">
+                        Следующая комната
+                        <span class="btn-icon">→</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Экран обработки -->
+        <div class="screen" id="processingScreen">
+            <div class="screen-content centered">
+                <div class="processing-animation">
+                    <div class="ai-loader">
+                        <div class="ai-brain">🤖</div>
+                        <div class="pulse-ring"></div>
+                        <div class="pulse-ring delay-1"></div>
+                        <div class="pulse-ring delay-2"></div>
+                    </div>
+                    <h2>Обработка данных</h2>
+                    <p class="ai-status" id="aiStatus">ИИ анализирует ваши снимки и создает план помещения...</p>
+                </div>
+
+                <div class="processing-steps">
+                    <div class="processing-step active">
+                        <div class="step-indicator">
+                            <span class="step-number">1</span>
+                            <div class="step-check">✓</div>
+                        </div>
+                        <span class="step-text">Анализ геометрии помещения</span>
+                        <div class="step-progress"></div>
+                    </div>
+                    <div class="processing-step">
+                        <div class="step-indicator">
+                            <span class="step-number">2</span>
+                            <div class="step-check">✓</div>
+                        </div>
+                        <span class="step-text">Определение комнат</span>
+                        <div class="step-progress"></div>
+                    </div>
+                    <div class="processing-step">
+                        <div class="step-indicator">
+                            <span class="step-number">3</span>
+                            <div class="step-check">✓</div>
+                        </div>
+                        <span class="step-text">Создание 3D модели</span>
+                        <div class="step-progress"></div>
+                    </div>
+                    <div class="processing-step">
+                        <div class="step-indicator">
+                            <span class="step-number">4</span>
+                            <div class="step-check">✓</div>
+                        </div>
+                        <span class="step-text">Генерация тура</span>
+                        <div class="step-progress"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Экран результатов -->
+        <div class="screen" id="resultScreen">
+            <div class="screen-header">
+                <button class="btn btn-back" id="backFromResults">
+                    <span class="btn-icon">←</span>
+                    Назад
+                </button>
+                <h2>План помещения готов!</h2>
+            </div>
+
+            <div class="screen-content">
+                <div class="success-message">
+                    <div class="success-icon">🎉</div>
+                    <p>Ваш 3D тур успешно создан и готов к использованию</p>
+                </div>
+
+                <div class="result-content">
+                    <div class="floor-plan-section">
+                        <h3>План помещения</h3>
+                        <div class="floor-plan-container">
+                            <canvas id="floorPlanCanvas" width="400" height="400"></canvas>
+                            <div class="room-labels" id="roomLabels"></div>
+                        </div>
+                    </div>
+
+                    <div class="room-details-section">
+                        <h3>Обнаруженные помещения</h3>
+                        <div class="rooms-grid" id="roomList">
+                            <div class="room-item">
+                                <div class="room-icon">🛋️</div>
+                                <div class="room-info">
+                                    <div class="room-name">Гостиная</div>
+                                    <div class="room-area">20 м²</div>
+                                </div>
+                            </div>
+                            <div class="room-item">
+                                <div class="room-icon">👨‍🍳</div>
+                                <div class="room-info">
+                                    <div class="room-name">Кухня</div>
+                                    <div class="room-area">12 м²</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-secondary" id="editPlanButton">
+                        <span class="btn-icon">✏️</span>
+                        Редактировать план
+                    </button>
+                    <button class="btn btn-primary" id="viewTourButton">
+                        <span class="btn-icon">👁️</span>
+                        Посмотреть 3D тур
+                    </button>
+                    <button class="btn btn-success" id="shareButton">
+                        <span class="btn-icon">📤</span>
+                        Поделиться
+                    </button>
+                </div>
+
+                <div class="platform-export">
+                    <h3>Экспорт на платформы</h3>
+                    <div class="platform-buttons">
+                        <button class="btn btn-platform yandex" data-platform="yandex">
+                            <span class="btn-icon">Я</span>
+                            Яндекс.Недвижимость
+                        </button>
+                        <button class="btn btn-platform cian" data-platform="cian">
+                            <span class="btn-icon">Ц</span>
+                            Циан
+                        </button>
+                        <button class="btn btn-platform avito" data-platform="avito">
+                            <span class="btn-icon">А</span>
+                            Авито
+                        </button>
+                        <button class="btn btn-platform domclick" data-platform="domclick">
+                            <span class="btn-icon">Д</span>
+                            ДомКлик
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Экран просмотра тура -->
+        <div class="screen" id="tourViewerScreen">
+            <div class="screen-header">
+                <button class="btn btn-back" id="backFromViewer">
+                    <span class="btn-icon">←</span>
+                    Назад
+                </button>
+                <h2>3D тур помещения</h2>
+                <div class="viewer-actions">
+                    <button class="btn btn-icon" id="fullscreenButton">
+                        <span class="btn-icon">⛶</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="screen-content">
+                <div class="tour-container" id="tourContainer">
+                    <div class="tour-loading">
+                        <div class="loader"></div>
+                        <p>Загрузка 3D тура...</p>
+                    </div>
+                </div>
+
+                <div class="tour-controls">
+                    <div class="control-group">
+                        <button class="btn btn-control" id="zoomIn">
+                            <span class="btn-icon">+</span>
+                        </button>
+                        <button class="btn btn-control" id="zoomOut">
+                            <span class="btn-icon">-</span>
+                        </button>
+                    </div>
+                    
+                    <div class="tour-hotspots" id="tourHotspots">
+                        <button class="btn btn-hotspot" data-room="living-room">
+                            <span class="btn-icon">🛋️</span>
+                            Гостиная
+                        </button>
+                        <button class="btn btn-hotspot" data-room="kitchen">
+                            <span class="btn-icon">👨‍🍳</span>
+                            Кухня
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Модальное окно редактирования -->
+        <div class="modal" id="editModal">
+            <div class="modal-overlay"></div>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Редактирование плана</h3>
+                    <button class="btn btn-close" id="closeEditModal">
+                        <span class="btn-icon">×</span>
+                    </button>
+                </div>
+                
+                <div class="modal-body">
+                    <div class="edit-tools">
+                        <button class="btn btn-tool active" data-tool="select">
+                            <span class="btn-icon">↖️</span>
+                            Выбор
+                        </button>
+                        <button class="btn btn-tool" data-tool="wall">
+                            <span class="btn-icon">🧱</span>
+                            Стены
+                        </button>
+                        <button class="btn btn-tool" data-tool="door">
+                            <span class="btn-icon">🚪</span>
+                            Двери
+                        </button>
+                        <button class="btn btn-tool" data-tool="window">
+                            <span class="btn-icon">🪟</span>
+                            Окна
+                        </button>
+                        <button class="btn btn-tool" data-tool="furniture">
+                            <span class="btn-icon">🛋️</span>
+                            Мебель
+                        </button>
+                    </div>
+
+                    <div class="edit-area">
+                        <canvas id="editCanvas" width="400" height="400"></canvas>
+                    </div>
+
+                    <div class="edit-options" id="editOptions">
+                        <div class="option-group">
+                            <label>Толщина стены</label>
+                            <input type="range" min="1" max="10" value="2">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" id="cancelEdit">
+                        Отмена
+                    </button>
+                    <button class="btn btn-primary" id="saveEdit">
+                        Сохранить изменения
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Модальное окно экспорта -->
+        <div class="modal" id="exportModal">
+            <div class="modal-overlay"></div>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Экспорт тура</h3>
+                    <button class="btn btn-close" id="closeExportModal">
+                        <span class="btn-icon">×</span>
+                    </button>
+                </div>
+                
+                <div class="modal-body">
+                    <div class="export-options">
+                        <div class="option-card">
+                            <div class="option-icon">📁</div>
+                            <h4>Сохранить на устройство</h4>
+                            <p>Скачайте ZIP-архив с туром для ручной загрузки</p>
+                            <button class="btn btn-primary" id="saveToDevice">
+                                Скачать архив
+                            </button>
+                        </div>
+                        
+                        <div class="option-card">
+                            <div class="option-icon">🌐</div>
+                            <h4>Поделиться ссылкой</h4>
+                            <p>Сгенерируйте публичную ссылку для просмотра тура онлайн</p>
+                            <button class="btn btn-primary" id="generateLink">
+                                Создать ссылку
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="platform-export">
+                        <h4>Экспорт на платформы</h4>
+                        <div class="platform-grid">
+                            <button class="btn btn-platform yandex" data-platform="yandex">
+                                Яндекс.Недвижимость
+                            </button>
+                            <button class="btn btn-platform cian" data-platform="cian">
+                                Циан
+                            </button>
+                            <button class="btn btn-platform avito" data-platform="avito">
+                                Авито
+                            </button>
+                            <button class="btn btn-platform domclick" data-platform="domclick">
+                                ДомКлик
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
+    <!-- Уведомления -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Скрипты -->
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.18.0"></script>
     <script src="script.js"></script>
     <script src="platforms/cian-export.js"></script>
     <script src="platforms/avito-export.js"></script>
     <script src="platforms/domclick-export.js"></script>
     <script src="platforms/yandex-export.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.18.0"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <!-- Enhanced Header Section -->
-<div class="header">
-    <div class="logo-container">
-        <img src="assets/images/logo.png" alt="TourForge AI Logo" class="logo">
-        <h1>TourForge <span class="ai-text">AI</span></h1>
-    </div>
-    <p>Создавайте профессиональные 3D туры с искусственным интеллектом</p>
-</div>
-
-<!-- Platform Badges -->
-<div class="platform-badges">
-    <div class="badge">
-        <img src="assets/icons/yandex.svg" alt="Yandex">
-        <span>Яндекс.Недвижимость</span>
-    </div>
-    <div class="badge">
-        <img src="assets/icons/cian.svg" alt="Cian">
-        <span>Циан</span>
-    </div>
-    <div class="badge">
-        <img src="assets/icons/avito.svg" alt="Avito">
-        <span>Авито</span>
-    </div>
-</div>
 </body>
 </html>
