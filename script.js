@@ -273,3 +273,50 @@ class PhoneSensorManager {
         return movement < 2; // Порог стабильности
     }
 }
+// Анимация кнопок при наведении
+function enhanceButtons() {
+    const buttons = document.querySelectorAll('button');
+    
+    buttons.forEach(btn => {
+        // Добавляем эффект волны при клике
+        btn.addEventListener('click', function(e) {
+            const x = e.clientX - e.target.offsetLeft;
+            const y = e.clientY - e.target.offsetTop;
+            
+            const ripple = document.createElement('span');
+            ripple.classList.add('ripple-effect');
+            ripple.style.left = `${x}px`;
+            ripple.style.top = `${y}px`;
+            
+            this.appendChild(ripple);
+            
+            setTimeout(() => {
+                ripple.remove();
+            }, 600);
+        });
+    });
+}
+
+// CSS для эффекта ripple
+const rippleStyles = `
+.ripple-effect {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.4);
+    transform: scale(0);
+    animation: ripple 0.6s linear;
+    pointer-events: none;
+}
+
+@keyframes ripple {
+    to {
+        transform: scale(2.5);
+        opacity: 0;
+    }
+}
+`;
+
+// Добавляем стили в документ
+const styleSheet = document.createElement('style');
+styleSheet.textContent = rippleStyles;
+document.head.appendChild(styleSheet);
